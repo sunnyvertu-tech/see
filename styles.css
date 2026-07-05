@@ -135,6 +135,11 @@ select {
   background: rgba(49, 95, 63, 0.12);
 }
 
+.side-action.active {
+  color: var(--green-deep);
+  background: rgba(49, 95, 63, 0.12);
+}
+
 .sidebar-logout {
   width: 100%;
   min-height: 42px;

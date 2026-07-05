@@ -74,6 +74,7 @@ const loginForm = document.querySelector("#loginForm");
 const loginError = document.querySelector("#loginError");
 const tableBody = document.querySelector("#tableBody");
 const viewButtons = document.querySelectorAll(".view-tab");
+const companyPerformanceButton = document.querySelector("#companyPerformanceButton");
 const salesNavSection = document.querySelector("#salesNavSection");
 const salesMenuToggle = document.querySelector("#salesMenuToggle");
 const salesMenuPanel = document.querySelector("#salesMenuPanel");
@@ -427,6 +428,7 @@ function renderUsers() {
 function showApp(user) {
   currentUser = user;
   currentRole = user.role;
+  currentView = "";
   loginScreen.classList.add("hidden");
   appShell.classList.remove("hidden");
   renderTable();
@@ -512,6 +514,7 @@ function renderPermissionState() {
     button.hidden = !canView(view);
     button.classList.toggle("active", view === currentView);
   });
+  companyPerformanceButton.classList.toggle("active", !currentView);
 
   addStockButton.hidden = !currentView || (currentView === "sales" ? !canUse("addSales") : !canUse("addStock"));
   addStockButton.textContent = currentView === "sales" ? "新增销售" : "新增库存";
@@ -671,6 +674,11 @@ viewButtons.forEach((button) => {
     currentView = button.dataset.view;
     renderTable();
   });
+});
+
+companyPerformanceButton.addEventListener("click", () => {
+  currentView = "";
+  renderTable();
 });
 
 salesMenuToggle.addEventListener("click", () => {
