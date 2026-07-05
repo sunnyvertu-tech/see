@@ -23,6 +23,7 @@ body {
   color: var(--ink);
   background: linear-gradient(180deg, #f7faf8 0%, var(--bg) 100%);
   min-height: 100vh;
+  -webkit-text-size-adjust: 100%;
 }
 
 .hidden {
@@ -245,7 +246,7 @@ label span {
 input,
 select {
   width: 100%;
-  height: 40px;
+  min-height: 40px;
   padding: 0 10px;
   border: 1px solid var(--line);
   border-radius: 6px;
@@ -268,7 +269,7 @@ select:focus {
 
 .primary-button,
 .ghost-button {
-  height: 42px;
+  min-height: 42px;
   border: 0;
   border-radius: 6px;
   cursor: pointer;
@@ -427,6 +428,8 @@ select:focus {
 .table-wrap {
   overflow: auto;
   max-height: calc(100vh - 238px);
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
 }
 
 table {
@@ -704,13 +707,22 @@ dialog::backdrop {
     display: grid;
     gap: 14px;
     height: auto;
-    padding: 16px 18px;
+    padding: calc(14px + env(safe-area-inset-top)) 18px 16px;
     border-right: 0;
     border-bottom: 1px solid #d9dedc;
   }
 
   .sidebar-brand {
+    gap: 10px;
     margin-bottom: 14px;
+  }
+
+  .sidebar-brand strong {
+    font-size: 22px;
+  }
+
+  .side-nav {
+    gap: 8px;
   }
 
   .view-tabs {
@@ -730,10 +742,12 @@ dialog::backdrop {
 
   .workspace {
     padding: 18px;
+    padding-bottom: calc(18px + env(safe-area-inset-bottom));
   }
 
   .metrics {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
   }
 
   .topbar,
@@ -743,17 +757,172 @@ dialog::backdrop {
   }
 }
 
-@media (max-width: 560px) {
-  .metrics {
-    grid-template-columns: 1fr;
+@media (max-width: 640px) {
+  .login-screen {
+    padding: 18px;
+    padding-top: calc(18px + env(safe-area-inset-top));
+    padding-bottom: calc(18px + env(safe-area-inset-bottom));
+  }
+
+  .login-card {
+    padding: 24px;
+  }
+
+  .login-brand strong {
+    font-size: 22px;
+  }
+
+  .workspace {
+    padding: 12px;
+    padding-bottom: calc(14px + env(safe-area-inset-bottom));
   }
 
   .actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .user-badge {
+    grid-column: 1 / -1;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .primary-button,
+  .ghost-button,
+  .compact {
+    width: 100%;
+    min-width: 0;
+    padding: 0 10px;
+  }
+
+  .metrics {
+    grid-template-columns: 1fr;
+    margin-bottom: 12px;
+  }
+
+  .metrics article {
+    padding: 14px;
+  }
+
+  .metrics strong {
+    font-size: 22px;
+  }
+
+  .table-toolbar {
+    padding: 12px;
+  }
+
+  .table-toolbar span {
+    display: block;
+    margin: 4px 0 0;
+  }
+
+  .table-wrap {
+    max-height: calc(100vh - 360px);
+    border-top: 1px solid var(--line);
+  }
+
+  table {
+    min-width: 1080px;
+  }
+
+  th,
+  td {
+    padding: 8px;
+  }
+
+  dialog {
+    width: calc(100vw - 20px);
+    max-height: calc(100vh - 20px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  }
+
+  #saleForm,
+  #itemForm {
+    padding: 16px;
+  }
+
+  #userDialog {
+    width: calc(100vw - 20px);
+    max-height: calc(100vh - 20px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  }
+
+  #userForm {
+    max-height: calc(100vh - 20px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  }
+
+  #userForm .dialog-head,
+  #userForm .dialog-actions {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  #userForm .user-manager {
+    margin-left: 16px;
+    margin-right: 16px;
+  }
+
+  .user-row {
+    align-items: stretch;
     flex-direction: column;
   }
 
-  .compact,
-  .ghost-button {
-    width: 100%;
+  .user-row-actions {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .permission-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 380px) {
+  .actions {
+    grid-template-columns: 1fr;
+  }
+
+  .permission-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar-brand strong {
+    font-size: 20px;
+  }
+}
+
+@media (min-width: 981px) and (max-width: 1280px) {
+  .app-shell {
+    grid-template-columns: 220px minmax(0, 1fr);
+  }
+
+  .sidebar {
+    padding: 20px 16px;
+  }
+
+  .workspace {
+    padding: 22px;
+  }
+
+  .metrics {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (orientation: landscape) and (max-height: 520px) {
+  .sidebar {
+    position: static;
+    height: auto;
+  }
+
+  .table-wrap {
+    max-height: 320px;
+  }
+
+  dialog,
+  #userDialog,
+  #userForm {
+    max-height: calc(100vh - 16px);
   }
 }
