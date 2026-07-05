@@ -222,6 +222,17 @@ function renderMetrics(list) {
   document.querySelector("#resultCount").textContent = currentView ? `${list.length} 条记录` : "无权限访问";
 }
 
+function applySale(item, salePrice, seller) {
+  return {
+    ...item,
+    sold: true,
+    salePrice,
+    seller,
+    soldBy: currentUser?.username || "",
+    owner: item.owner || currentUser?.username || ""
+  };
+}
+
 function renderPermissionState() {
   currentUserLabel.textContent = currentUser ? `${currentUser.username} / ${roleName(currentRole)}` : "未登录";
   addUserButton.hidden = currentRole !== "super_admin";
@@ -514,24 +525,36 @@ itemForm.addEventListener("submit", (event) => {
   const formData = new FormData(itemForm);
   const nextId = Math.max(0, ...items.map((item) => item.id)) + 1;
   const isSalesView = currentView === "sales";
-  items = [
-    {
-      id: nextId,
-      date: formData.get("date"),
-      model: formData.get("model").trim(),
-      style: formData.get("style").trim(),
-      vsn: formData.get("vsn").trim(),
-      warehouse: formData.get("warehouse").trim(),
-      price: Number(formData.get("price")),
-      cost: Number(formData.get("cost")),
-      sold: isSalesView,
-      salePrice: isSalesView ? Number(formData.get("salePrice")) : 0,
-      seller: isSalesView ? formData.get("seller").trim() : "",
-      owner: currentUser?.username || "",
-      soldBy: isSalesView ? currentUser?.username || "" : ""
-    },
-    ...items
-  ];
+  const vsn = formData.get("vsn").trim();
+  const salePrice = isSalesView ? Number(formData.get("salePrice")) : 0;
+  const seller = isSalesView ? formData.get("seller").trim() : "";
+  const inventoryItem = isSalesView ? items.find((item) => !item.sold && item.vsn === vsn) : null;
+
+  if (inventoryItem) {
+    items = items.map((item) => {
+      if (item.id !== inventoryItem.id) return item;
+      return applySale(item, salePrice, seller);
+    });
+  } else {
+    items = [
+      {
+        id: nextId,
+        date: formData.get("date"),
+        model: formData.get("model").trim(),
+        style: formData.get("style").trim(),
+        vsn,
+        warehouse: formData.get("warehouse").trim(),
+        price: Number(formData.get("price")),
+        cost: Number(formData.get("cost")),
+        sold: isSalesView,
+        salePrice,
+        seller,
+        owner: currentUser?.username || "",
+        soldBy: isSalesView ? currentUser?.username || "" : ""
+      },
+      ...items
+    ];
+  }
   itemForm.reset();
   itemForm.elements.date.value = "2026-07-05";
   stockDialog.close();
@@ -574,14 +597,7 @@ saleForm.addEventListener("submit", (event) => {
   const id = Number(saleForm.elements.id.value);
   items = items.map((item) => {
     if (item.id !== id) return item;
-    return {
-      ...item,
-      sold: true,
-      salePrice: Number(saleForm.elements.salePrice.value),
-      seller: saleForm.elements.seller.value.trim(),
-      soldBy: currentUser?.username || "",
-      owner: item.owner || currentUser?.username || ""
-    };
+    return applySale(item, Number(saleForm.elements.salePrice.value), saleForm.elements.seller.value.trim());
   });
   save();
   saleDialog.close();
