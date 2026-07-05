@@ -368,6 +368,218 @@ select:focus {
   white-space: nowrap;
 }
 
+.performance-dashboard {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.performance-dashboard.hidden {
+  display: none;
+}
+
+.performance-panel {
+  padding: 16px;
+  border-radius: 14px;
+}
+
+.day-panel {
+  background: #eef5ff;
+}
+
+.period-panel {
+  background: #eafbf2;
+}
+
+.performance-panel h2,
+.rank-card h3,
+.period-card h3 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 15px;
+}
+
+.performance-panel h2 {
+  margin-bottom: 10px;
+}
+
+.day-summary-grid,
+.rank-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.performance-card,
+.rank-card,
+.period-card {
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 10px 28px rgba(40, 55, 48, 0.08);
+}
+
+.performance-card {
+  padding: 14px;
+}
+
+.card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.card-head span,
+.period-card > div > span {
+  color: #7c3aed;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.card-head strong {
+  color: var(--danger);
+  font-size: 13px;
+}
+
+.performance-card p,
+.period-card p {
+  margin: 8px 0;
+}
+
+.performance-card p strong,
+.period-card p strong {
+  margin-right: 4px;
+  font-size: 22px;
+}
+
+.performance-card p span,
+.period-card p span,
+.performance-card small,
+.period-card small {
+  color: var(--muted);
+}
+
+.badge-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-height: 22px;
+  margin-top: 8px;
+}
+
+.metric-badge {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 999px;
+  color: #067647;
+  background: #c9f7df;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.metric-badge.bad {
+  color: #c43131;
+  background: #ffe0e0;
+}
+
+.rank-card {
+  min-height: 148px;
+  padding: 14px;
+  margin-top: 12px;
+}
+
+.bar-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.bar-row {
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr) 48px;
+  align-items: center;
+  gap: 8px;
+  color: #5c6863;
+  font-size: 12px;
+}
+
+.bar-track {
+  height: 14px;
+  overflow: hidden;
+  background: #eef1ef;
+}
+
+.bar-track i {
+  display: block;
+  width: var(--bar-width);
+  height: 100%;
+  background: var(--bar-color, var(--blue));
+}
+
+.bar-empty {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.period-panel {
+  display: grid;
+  gap: 12px;
+}
+
+.period-card {
+  display: grid;
+  grid-template-columns: minmax(190px, 0.9fr) minmax(260px, 1fr);
+  gap: 20px;
+  padding: 14px;
+}
+
+.period-card > div > small {
+  display: block;
+  margin-top: 4px;
+}
+
+.progress-group {
+  display: grid;
+  gap: 7px;
+  margin-top: 10px;
+}
+
+.progress-group div {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.progress-group strong {
+  color: #067647;
+}
+
+.progress-track {
+  display: block;
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #eef1ef;
+}
+
+.progress-track i {
+  display: block;
+  width: var(--progress-width, 0%);
+  height: 100%;
+  border-radius: inherit;
+  background: #15b67b;
+}
+
+.progress-track.orange i {
+  background: #f59e0b;
+}
+
 .metrics {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -750,6 +962,14 @@ dialog::backdrop {
     gap: 10px;
   }
 
+  .performance-dashboard {
+    grid-template-columns: 1fr;
+  }
+
+  .period-card {
+    grid-template-columns: 1fr;
+  }
+
   .topbar,
   .table-toolbar {
     align-items: stretch;
@@ -800,6 +1020,36 @@ dialog::backdrop {
   .metrics {
     grid-template-columns: 1fr;
     margin-bottom: 12px;
+  }
+
+  .performance-dashboard {
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .performance-panel {
+    padding: 12px;
+    border-radius: 12px;
+  }
+
+  .day-summary-grid,
+  .rank-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .performance-card,
+  .rank-card,
+  .period-card {
+    border-radius: 10px;
+  }
+
+  .performance-card p strong,
+  .period-card p strong {
+    font-size: 20px;
+  }
+
+  .bar-row {
+    grid-template-columns: 70px minmax(0, 1fr) 48px;
   }
 
   .metrics article {

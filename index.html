@@ -74,6 +74,78 @@
           </div>
         </header>
 
+        <section id="performanceDashboard" class="performance-dashboard" aria-label="业绩看板">
+          <div class="performance-panel day-panel">
+            <h2>当日 & 昨日对比</h2>
+            <div class="day-summary-grid">
+              <article class="performance-card">
+                <div class="card-head">
+                  <span id="todayLabel">今日</span>
+                  <strong id="todayRate">0%</strong>
+                </div>
+                <p><strong id="todayAmount">0万</strong><span id="todayGoal">（目标: 0万）</span></p>
+                <small id="todayMeta">定金: 0.00万　退款: 0.00万</small>
+                <div id="todayBadges" class="badge-line"></div>
+              </article>
+              <article class="performance-card">
+                <div class="card-head">
+                  <span id="yesterdayLabel">昨日</span>
+                  <strong id="yesterdayRate">0%</strong>
+                </div>
+                <p><strong id="yesterdayAmount">0万</strong><span id="yesterdayGoal">（目标: 0万）</span></p>
+                <small id="yesterdayMeta">定金: 0.00万　退款: 0.00万</small>
+                <div id="yesterdayBadges" class="badge-line"></div>
+              </article>
+            </div>
+            <div class="rank-grid">
+              <article class="rank-card">
+                <h3>今日销售员排行</h3>
+                <div id="todayRank" class="bar-list"></div>
+              </article>
+              <article class="rank-card">
+                <h3>昨日销售员排行</h3>
+                <div id="yesterdayRank" class="bar-list"></div>
+              </article>
+            </div>
+          </div>
+
+          <div class="performance-panel period-panel">
+            <h2>本周 & 本月业绩</h2>
+            <article class="period-card">
+              <div>
+                <span id="weekLabel">本周</span>
+                <small id="weekRange">统计 --</small>
+                <p><strong id="weekAmount">0万</strong><span id="weekGoal">（目标: 0万）</span></p>
+                <small id="weekMeta">定金: 0.00万　退款: 0.00万</small>
+                <div id="weekBadges" class="badge-line"></div>
+              </div>
+              <div>
+                <h3>本周销售员排行</h3>
+                <div id="weekRank" class="bar-list"></div>
+              </div>
+            </article>
+            <article class="period-card">
+              <div>
+                <span id="monthLabel">本月</span>
+                <small id="monthRange">统计 --</small>
+                <p><strong id="monthAmount">0万</strong><span id="monthGoal">（目标: 0万）</span></p>
+                <small id="monthMeta">定金: 0.00万　退款: 0.00万</small>
+                <div id="monthBadges" class="badge-line"></div>
+                <div class="progress-group">
+                  <div><span>目标达成率</span><strong id="monthProgressText">0%</strong></div>
+                  <span class="progress-track"><i id="monthProgressBar"></i></span>
+                  <div><span>时间进度</span><strong id="monthTimeText">0%</strong></div>
+                  <span class="progress-track orange"><i id="monthTimeBar"></i></span>
+                </div>
+              </div>
+              <div>
+                <h3>本月销售员排行</h3>
+                <div id="monthRank" class="bar-list"></div>
+              </div>
+            </article>
+          </div>
+        </section>
+
         <section class="metrics" aria-label="销售统计">
           <article data-metric="stock">
             <span>库存件数</span>
