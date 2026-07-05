@@ -376,7 +376,7 @@ function openSaleDialog(id) {
 }
 
 function exportCsv() {
-  const headers = ["日期", "型号", "款式", "VSN", "库存仓库", "原价", "成本", "售卖", "售卖价", "利润", "销售人"];
+  const headers = ["日期", "型号", "款式", "VSN", "库存仓库", "原价", "成本", "售卖", "售卖价", "利润", "销售员"];
   const rows = filteredItems().map((item) => [
     item.date,
     item.model,
@@ -460,7 +460,7 @@ function importCsv(file) {
         cost: toNumber(getCell(row, "成本")),
         sold,
         salePrice: sold ? toNumber(getCell(row, "售卖价")) : 0,
-        seller: sold ? getCell(row, "销售人").trim() : "",
+        seller: sold ? (getCell(row, "销售员") || getCell(row, "销售人")).trim() : "",
         owner: currentUser?.username || "",
         soldBy: sold ? currentUser?.username || "" : ""
       };
