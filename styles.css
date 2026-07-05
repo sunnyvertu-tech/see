@@ -343,6 +343,14 @@ th {
   text-align: center;
 }
 
+.sold-select:disabled {
+  color: #4d5a55;
+  background: #eef3f0;
+  border-color: #d6dfda;
+  cursor: not-allowed;
+  opacity: 1;
+}
+
 .link-button {
   border: 0;
   background: transparent;

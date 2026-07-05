@@ -241,7 +241,7 @@ function renderTable() {
       <td>${formatNumber(item.price)}</td>
       <td>${formatNumber(item.cost)}</td>
       <td>
-        <select class="sold-select" data-action="sold-status" data-id="${item.id}">
+        <select class="sold-select" data-action="sold-status" data-id="${item.id}" ${item.sold ? "" : "disabled"}>
           <option value="yes" ${item.sold ? "selected" : ""}>是</option>
           <option value="no" ${!item.sold ? "selected" : ""}>否</option>
         </select>
