@@ -22,7 +22,7 @@ const seedItems = [
 let items = JSON.parse(localStorage.getItem("sales-demo-items") || "null") || seedItems;
 let sortKey = "date";
 let sortDir = "desc";
-let currentView = "stock";
+let currentView = "";
 const featureModules = [
   { key: "stock", label: "库存" },
   { key: "sales", label: "销售" },
@@ -94,6 +94,8 @@ const stockSubmitButton = document.querySelector("#stockSubmitButton");
 const saleDialog = document.querySelector("#saleDialog");
 const saleForm = document.querySelector("#saleForm");
 const importInput = document.querySelector("#importInput");
+const metricsSection = document.querySelector(".metrics");
+const tableZone = document.querySelector(".table-zone");
 
 const money = new Intl.NumberFormat("zh-CN", {
   style: "currency",
@@ -455,6 +457,8 @@ function filteredItems() {
 }
 
 function renderMetrics(list) {
+  metricsSection.classList.toggle("hidden", !currentView);
+  tableZone.classList.toggle("hidden", !currentView);
   document.querySelectorAll('[data-metric="stock"]').forEach((card) => {
     card.classList.toggle("hidden", currentView !== "stock");
   });
@@ -494,7 +498,7 @@ function renderPermissionState() {
 
   const views = allowedViews();
   salesNavSection.hidden = views.length === 0;
-  if (!views.includes(currentView)) currentView = views[0] || "";
+  if (currentView && !views.includes(currentView)) currentView = "";
 
   viewButtons.forEach((button) => {
     const view = button.dataset.view;
