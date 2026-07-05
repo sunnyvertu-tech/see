@@ -336,24 +336,15 @@ th {
 }
 
 .sold-status {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 44px;
-  height: 28px;
-  padding: 0 12px;
-  border-radius: 999px;
   font-weight: 800;
 }
 
 .sold-status.sold {
-  color: #fff;
-  background: var(--blue);
+  color: var(--ink);
 }
 
 .sold-status.unsold {
-  color: #53605b;
-  background: #eef3f0;
+  color: var(--ink);
 }
 
 .link-button {
