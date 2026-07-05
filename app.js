@@ -201,6 +201,13 @@ function visibleSalesItems() {
   return items.filter((item) => item.sold).filter((item) => canViewAllData() || isOwnItem(item));
 }
 
+function latestSalesDate(list) {
+  return list.reduce((latest, item) => {
+    const itemDate = parseItemDate(item.date);
+    return !latest || itemDate > latest ? itemDate : latest;
+  }, null);
+}
+
 function sumSales(list) {
   return list.reduce((sum, item) => sum + Number(item.salePrice || 0), 0);
 }
@@ -264,13 +271,13 @@ function renderPerformanceDashboard() {
   dashboard.classList.toggle("hidden", !canUse("sales"));
   if (!canUse("sales")) return;
 
-  const now = new Date();
+  const sales = visibleSalesItems();
+  const now = latestSalesDate(sales) || new Date();
   const today = dateKey(now);
   const yesterday = dateKey(shiftDate(now, -1));
   const weekStart = startOfWeek(now);
   const monthStart = startOfMonth(now);
   const monthEnd = endOfMonth(now);
-  const sales = visibleSalesItems();
   const todayItems = sales.filter((item) => item.date === today);
   const yesterdayItems = sales.filter((item) => item.date === yesterday);
   const weekItems = sales.filter((item) => isBetweenDates(item.date, weekStart, now));
