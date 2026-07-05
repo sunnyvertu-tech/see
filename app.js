@@ -266,10 +266,7 @@ function renderTable() {
       <td>${formatNumber(item.price)}</td>
       <td>${formatNumber(item.cost)}</td>
       <td>
-        <select class="sold-select" data-action="sold-status" data-id="${item.id}" ${item.sold ? "" : "disabled"}>
-          <option value="yes" ${item.sold ? "selected" : ""}>是</option>
-          <option value="no" ${!item.sold ? "selected" : ""}>否</option>
-        </select>
+        <span class="sold-status ${item.sold ? "sold" : "unsold"}">${item.sold ? "是" : "否"}</span>
       </td>
       <td>${item.sold ? formatNumber(item.salePrice) : ""}</td>
       <td>${item.sold ? formatNumber(profitOf(item)) : ""}</td>
@@ -569,27 +566,6 @@ tableBody.addEventListener("click", (event) => {
     save();
     renderTable();
   }
-});
-
-tableBody.addEventListener("change", (event) => {
-  const select = event.target.closest('select[data-action="sold-status"]');
-  if (!select) return;
-  const id = Number(select.dataset.id);
-  if (select.value === "yes") {
-    openSaleDialog(id);
-    return;
-  }
-  items = items.map((item) => {
-    if (item.id !== id) return item;
-    return {
-      ...item,
-      sold: false,
-      salePrice: 0,
-      seller: ""
-    };
-  });
-  save();
-  renderTable();
 });
 
 saleForm.addEventListener("submit", (event) => {
