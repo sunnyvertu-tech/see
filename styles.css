@@ -382,7 +382,44 @@ dialog::backdrop {
 }
 
 #userForm {
-  width: min(680px, calc(100vw - 32px));
+  width: 100%;
+  max-height: calc(100vh - 48px);
+  overflow: auto;
+  padding: 0;
+}
+
+#userDialog {
+  width: min(760px, calc(100vw - 28px));
+  max-height: calc(100vh - 48px);
+  overflow: hidden;
+}
+
+#userForm .dialog-head {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  margin: 0;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--line);
+  background: #fff;
+}
+
+#userForm .dialog-head strong {
+  font-size: 20px;
+}
+
+#userForm .dialog-actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  margin: 0;
+  padding: 16px 20px 18px;
+  border-top: 1px solid var(--line);
+  background: #fff;
+}
+
+#userForm .user-manager {
+  margin: 16px 20px 0;
 }
 
 .user-manager {
@@ -396,6 +433,10 @@ dialog::backdrop {
 .add-user-panel {
   display: grid;
   gap: 14px;
+}
+
+.add-user-panel > label {
+  margin-bottom: 0;
 }
 
 .section-title {
@@ -457,6 +498,7 @@ dialog::backdrop {
 .permission-list {
   display: grid;
   gap: 8px;
+  overflow-x: auto;
 }
 
 .default-permissions {
