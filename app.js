@@ -23,11 +23,18 @@ let items = JSON.parse(localStorage.getItem("sales-demo-items") || "null") || se
 let sortKey = "date";
 let sortDir = "desc";
 let currentView = "stock";
-let users = JSON.parse(localStorage.getItem("sales-demo-users") || "null") || [
+const defaultUsers = [
   { username: "admin", password: "admin123", role: "super_admin", permissions: { stock: true, sales: true } },
   { username: "manager", password: "123456", role: "manager" },
-  { username: "employee", password: "123456", role: "employee" }
+  { username: "employee", password: "123456", role: "employee" },
+  { username: "母彬", password: "123456", role: "employee", permissions: { stock: true, sales: true } },
+  { username: "叶美", password: "123456", role: "employee", permissions: { stock: true, sales: true } },
+  { username: "陈梦雪", password: "123456", role: "employee", permissions: { stock: true, sales: true } },
+  { username: "肖丽", password: "123456", role: "employee", permissions: { stock: true, sales: true } },
+  { username: "贾思懿", password: "123456", role: "employee", permissions: { stock: true, sales: true } },
+  { username: "soso", password: "123456", role: "employee", permissions: { stock: true, sales: true } }
 ];
+let users = JSON.parse(localStorage.getItem("sales-demo-users") || "null") || [];
 let currentUser = null;
 let currentRole = "";
 let permissions = JSON.parse(localStorage.getItem("sales-demo-permissions") || "null") || {
@@ -73,6 +80,16 @@ function savePermissions() {
 
 function saveUsers() {
   localStorage.setItem("sales-demo-users", JSON.stringify(users));
+}
+
+function mergeDefaultUsers() {
+  const existingNames = new Set(users.map((user) => user.username));
+  defaultUsers.forEach((user) => {
+    if (!existingNames.has(user.username)) {
+      users.push({ ...user, permissions: user.permissions ? { ...user.permissions } : undefined });
+    }
+  });
+  saveUsers();
 }
 
 function formatNumber(value) {
@@ -126,13 +143,21 @@ function renderUsers() {
           <strong>${user.username}</strong>
           <span>${roleName(user.role)} · ${permissionText}</span>
         </div>
-        <button
-          class="link-button danger"
-          data-action="delete-user"
-          data-username="${user.username}"
-          type="button"
-          ${canDelete ? "" : "disabled"}
-        >删除</button>
+        <div class="user-row-actions">
+          <button
+            class="link-button"
+            data-action="reset-user-password"
+            data-username="${user.username}"
+            type="button"
+          >重置密码</button>
+          <button
+            class="link-button danger"
+            data-action="delete-user"
+            data-username="${user.username}"
+            type="button"
+            ${canDelete ? "" : "disabled"}
+          >删除</button>
+        </div>
       </article>
     `;
   }).join("");
@@ -381,7 +406,7 @@ function fillPermissionForm() {
 loginForm.addEventListener("submit", (event) => {
   event.preventDefault();
   const username = loginForm.elements.username.value.trim();
-  const password = loginForm.elements.password.value;
+  const password = loginForm.elements.password.value.trim();
   const user = users.find((entry) => entry.username === username && entry.password === password);
   if (!user) {
     loginError.textContent = "账号或密码不正确";
@@ -422,7 +447,7 @@ userForm.addEventListener("submit", (event) => {
   userForm.elements.username.setCustomValidity("");
   users.push({
     username,
-    password: userForm.elements.password.value,
+    password: userForm.elements.password.value.trim(),
     role: userForm.elements.role.value,
     permissions: {
       stock: userForm.elements.stock.checked,
@@ -458,6 +483,16 @@ userForm.addEventListener("click", (event) => {
   }
 
   const deleteButton = event.target.closest('[data-action="delete-user"]');
+  const resetButton = event.target.closest('[data-action="reset-user-password"]');
+  if (resetButton) {
+    const username = resetButton.dataset.username;
+    users = users.map((entry) => entry.username === username ? { ...entry, password: "123456" } : entry);
+    saveUsers();
+    renderUsers();
+    window.alert(`${username} 的密码已重置为 123456`);
+    return;
+  }
+
   if (!deleteButton) return;
   const username = deleteButton.dataset.username;
   const user = users.find((entry) => entry.username === username);
@@ -608,6 +643,7 @@ importInput.addEventListener("change", () => {
 
 document.querySelector("#exportButton").addEventListener("click", exportCsv);
 
+mergeDefaultUsers();
 loadRememberedLogin();
 const lastLoginUser = localStorage.getItem("sales-demo-login-user");
 const savedUser = users.find((user) => user.username === lastLoginUser);
