@@ -40,7 +40,7 @@
         <header class="topbar">
           <div class="actions">
             <span id="currentUserLabel" class="user-badge">未登录</span>
-            <button id="addUserButton" class="ghost-button" type="button">新增用户</button>
+            <button id="addUserButton" class="ghost-button" type="button">用户管理</button>
             <button id="logoutButton" class="ghost-button" type="button">退出登录</button>
             <button id="resetButton" class="ghost-button" type="button">刷新</button>
             <input id="importInput" type="file" accept=".csv,text/csv" hidden />
@@ -112,9 +112,20 @@
     <dialog id="userDialog">
       <form id="userForm">
         <div class="dialog-head">
-          <strong>新增用户</strong>
+          <strong>用户管理</strong>
           <button data-action="close-user-dialog" type="button" aria-label="关闭">×</button>
         </div>
+        <section class="user-manager">
+          <div class="section-title">
+            <span>人员列表</span>
+            <small id="userCount">0 人</small>
+          </div>
+          <div class="user-list" id="userList"></div>
+        </section>
+        <section class="user-manager add-user-panel">
+          <div class="section-title">
+            <span>新增用户</span>
+          </div>
         <label>
           <span>账号</span>
           <input name="username" placeholder="请输入登录账号" required />
@@ -160,6 +171,7 @@
             <input name="employee-sales" type="checkbox" />
           </label>
         </div>
+        </section>
         <div class="dialog-actions">
           <button class="ghost-button" data-action="close-user-dialog" type="button">取消</button>
           <button class="primary-button compact" type="submit">保存用户</button>

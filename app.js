@@ -47,6 +47,8 @@ const addUserButton = document.querySelector("#addUserButton");
 const logoutButton = document.querySelector("#logoutButton");
 const userDialog = document.querySelector("#userDialog");
 const userForm = document.querySelector("#userForm");
+const userList = document.querySelector("#userList");
+const userCount = document.querySelector("#userCount");
 const itemForm = document.querySelector("#itemForm");
 const stockDialog = document.querySelector("#stockDialog");
 const addStockButton = document.querySelector("#addStockButton");
@@ -106,6 +108,34 @@ function roleName(role) {
     manager: "主管",
     employee: "员工"
   }[role] || role;
+}
+
+function renderUsers() {
+  userCount.textContent = `${users.length} 人`;
+  userList.innerHTML = users.map((user) => {
+    const isCurrent = currentUser?.username === user.username;
+    const isLastAdmin = user.role === "super_admin" && users.filter((entry) => entry.role === "super_admin").length === 1;
+    const canDelete = !isCurrent && !isLastAdmin;
+    const stockText = user.permissions?.stock ?? permissions[user.role]?.stock ? "库存" : "";
+    const salesText = user.permissions?.sales ?? permissions[user.role]?.sales ? "销售" : "";
+    const permissionText = [stockText, salesText].filter(Boolean).join(" / ") || "无权限";
+
+    return `
+      <article class="user-row">
+        <div>
+          <strong>${user.username}</strong>
+          <span>${roleName(user.role)} · ${permissionText}</span>
+        </div>
+        <button
+          class="link-button danger"
+          data-action="delete-user"
+          data-username="${user.username}"
+          type="button"
+          ${canDelete ? "" : "disabled"}
+        >删除</button>
+      </article>
+    `;
+  }).join("");
 }
 
 function showApp(user) {
@@ -377,6 +407,7 @@ addUserButton.addEventListener("click", () => {
   userForm.elements.stock.checked = true;
   userForm.elements.sales.checked = false;
   fillPermissionForm();
+  renderUsers();
   userDialog.showModal();
 });
 
@@ -411,14 +442,39 @@ userForm.addEventListener("submit", (event) => {
     }
   };
   savePermissions();
-  userDialog.close();
+  userForm.reset();
+  userForm.elements.stock.checked = true;
+  userForm.elements.sales.checked = false;
+  fillPermissionForm();
+  renderUsers();
   renderTable();
 });
 
 userForm.addEventListener("click", (event) => {
   const closeButton = event.target.closest('[data-action="close-user-dialog"]');
-  if (!closeButton) return;
-  userDialog.close();
+  if (closeButton) {
+    userDialog.close();
+    return;
+  }
+
+  const deleteButton = event.target.closest('[data-action="delete-user"]');
+  if (!deleteButton) return;
+  const username = deleteButton.dataset.username;
+  const user = users.find((entry) => entry.username === username);
+  if (!user || username === currentUser?.username) return;
+  const isLastAdmin = user.role === "super_admin" && users.filter((entry) => entry.role === "super_admin").length === 1;
+  if (isLastAdmin) return;
+  users = users.filter((entry) => entry.username !== username);
+  saveUsers();
+  if (localStorage.getItem("sales-demo-login-user") === username) {
+    localStorage.removeItem("sales-demo-login-user");
+  }
+  const remembered = JSON.parse(localStorage.getItem("sales-demo-remember") || "null");
+  if (remembered?.username === username) {
+    localStorage.removeItem("sales-demo-remember");
+  }
+  renderUsers();
+  renderTable();
 });
 
 itemForm.addEventListener("submit", (event) => {

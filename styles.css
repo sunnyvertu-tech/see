@@ -373,10 +373,82 @@ dialog::backdrop {
   padding: 20px;
 }
 
+#userForm {
+  width: min(680px, calc(100vw - 32px));
+}
+
+.user-manager {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 14px;
+  margin-bottom: 16px;
+  background: #fbfdfc;
+}
+
+.add-user-panel {
+  display: grid;
+  gap: 14px;
+}
+
+.section-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  color: var(--ink);
+  font-weight: 800;
+}
+
+.section-title small {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.user-list {
+  display: grid;
+  gap: 8px;
+  max-height: 240px;
+  overflow: auto;
+}
+
+.user-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.user-row div {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.user-row strong,
+.user-row span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.user-row span {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.user-row button:disabled {
+  color: #9aa5a0;
+  cursor: not-allowed;
+}
+
 .permission-list {
   display: grid;
   gap: 8px;
-  min-width: 340px;
 }
 
 .default-permissions {
