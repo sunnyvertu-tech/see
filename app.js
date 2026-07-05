@@ -56,7 +56,7 @@ const defaultUsers = [
   { username: "admin", password: "admin123", role: "super_admin", permissions: { ...allFeaturePermissions } },
   { username: "manager", password: "123456", role: "manager" },
   { username: "employee", password: "123456", role: "employee" },
-  { username: "母彬", password: "123456", role: "employee", permissions: { ...defaultRolePermissions.employee } },
+  { username: "母彬", password: "123456", role: "super_admin", permissions: { ...allFeaturePermissions } },
   { username: "叶美", password: "123456", role: "employee", permissions: { ...defaultRolePermissions.employee } },
   { username: "陈梦雪", password: "123456", role: "employee", permissions: { ...defaultRolePermissions.employee } },
   { username: "肖丽", password: "123456", role: "employee", permissions: { ...defaultRolePermissions.employee } },
@@ -123,7 +123,8 @@ function normalizePermissions() {
   };
   users = users.map((user) => ({
     ...user,
-    permissions: user.permissions ? normalizePermissionSet(user.permissions, user.role) : undefined
+    role: user.username === "母彬" ? "super_admin" : user.role,
+    permissions: user.username === "母彬" ? { ...allFeaturePermissions } : user.permissions ? normalizePermissionSet(user.permissions, user.role) : undefined
   }));
   savePermissions();
   saveUsers();
