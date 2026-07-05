@@ -36,6 +36,24 @@
     </section>
 
     <div class="app-shell hidden">
+      <aside class="sidebar" aria-label="系统导航">
+        <div class="sidebar-brand">
+          <span>销</span>
+          <strong>销售管理</strong>
+        </div>
+        <nav class="side-nav">
+          <div class="side-section">
+            <div class="side-section-title">
+              <span class="side-icon">销</span>
+              <span>销售管理</span>
+            </div>
+            <div class="view-tabs" aria-label="销售管理切换">
+              <button class="view-tab active" data-view="stock" type="button">库存</button>
+              <button class="view-tab" data-view="sales" type="button">销售</button>
+            </div>
+          </div>
+        </nav>
+      </aside>
       <main class="workspace">
         <header class="topbar">
           <div class="actions">
@@ -47,10 +65,6 @@
             <button id="importButton" class="ghost-button" type="button">导入</button>
             <button id="exportButton" class="primary-button compact" type="button">导出</button>
             <button id="addStockButton" class="primary-button compact" type="button">新增库存</button>
-          </div>
-          <div class="view-tabs" aria-label="管理台切换">
-            <button class="view-tab active" data-view="stock" type="button">库存</button>
-            <button class="view-tab" data-view="sales" type="button">销售</button>
           </div>
         </header>
 

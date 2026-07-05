@@ -36,7 +36,76 @@ select {
 }
 
 .app-shell {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
   min-height: 100vh;
+}
+
+.sidebar {
+  position: sticky;
+  top: 0;
+  align-self: start;
+  height: 100vh;
+  padding: 22px 20px;
+  border-right: 1px solid #d9dedc;
+  background:
+    radial-gradient(circle at 24px 120px, rgba(99, 102, 241, 0.13), transparent 28%),
+    radial-gradient(circle at 180px 520px, rgba(225, 91, 182, 0.12), transparent 32%),
+    linear-gradient(180deg, #fbfbff 0%, #f5f2ff 54%, #fff6fb 100%);
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 30px;
+  color: var(--ink);
+}
+
+.sidebar-brand span {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  color: #16301f;
+  background: #a6ce76;
+  font-size: 22px;
+  font-weight: 900;
+}
+
+.sidebar-brand strong {
+  font-size: 24px;
+}
+
+.side-nav,
+.side-section {
+  display: grid;
+  gap: 10px;
+}
+
+.side-section-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 42px;
+  padding: 0 12px;
+  border-radius: 10px;
+  color: #4d5352;
+  background: rgba(89, 92, 255, 0.1);
+  font-weight: 800;
+}
+
+.side-icon {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  color: white;
+  background: var(--green-deep);
+  font-size: 14px;
+  font-weight: 900;
 }
 
 .login-screen {
@@ -185,7 +254,7 @@ select:focus {
 
 .topbar {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
   gap: 18px;
   margin-bottom: 20px;
@@ -199,28 +268,28 @@ select:focus {
 }
 
 .view-tabs {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  margin-left: auto;
+  display: grid;
+  gap: 8px;
+  padding-left: 16px;
 }
 
 .view-tab {
   border: 0;
-  border-bottom: 3px solid transparent;
-  padding: 6px 2px 8px;
+  width: 100%;
+  min-height: 42px;
+  padding: 0 14px;
+  border-radius: 10px;
   background: transparent;
   color: var(--muted);
   cursor: pointer;
-  font-size: 28px;
-  font-weight: 900;
+  text-align: left;
+  font-size: 15px;
+  font-weight: 800;
 }
 
 .view-tab.active {
-  border-color: var(--green-deep);
-  color: var(--ink);
+  color: var(--green-deep);
+  background: rgba(49, 95, 63, 0.12);
 }
 
 .actions {
@@ -577,6 +646,31 @@ dialog::backdrop {
 }
 
 @media (max-width: 980px) {
+  .app-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    position: static;
+    height: auto;
+    padding: 16px 18px;
+    border-right: 0;
+    border-bottom: 1px solid #d9dedc;
+  }
+
+  .sidebar-brand {
+    margin-bottom: 14px;
+  }
+
+  .view-tabs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding-left: 0;
+  }
+
+  .view-tab {
+    text-align: center;
+  }
+
   .workspace {
     padding: 18px;
   }
