@@ -48,18 +48,23 @@
               <span>销售管理</span>
             </div>
             <div class="view-tabs" aria-label="销售管理切换">
-              <button class="view-tab active" data-view="stock" type="button">库存</button>
               <button class="view-tab" data-view="sales" type="button">销售</button>
+              <button class="view-tab active" data-view="stock" type="button">库存</button>
             </div>
           </div>
+          <div class="side-section">
+            <button id="addUserButton" class="side-section-title side-action" type="button">
+              <span class="side-icon">权</span>
+              <span>用户管理</span>
+            </button>
+          </div>
         </nav>
+        <button id="logoutButton" class="sidebar-logout" type="button">退出登录</button>
       </aside>
       <main class="workspace">
         <header class="topbar">
           <div class="actions">
             <span id="currentUserLabel" class="user-badge">未登录</span>
-            <button id="addUserButton" class="ghost-button" type="button">用户管理</button>
-            <button id="logoutButton" class="ghost-button" type="button">退出登录</button>
             <button id="resetButton" class="ghost-button" type="button">刷新</button>
             <input id="importInput" type="file" accept=".csv,text/csv" hidden />
             <button id="importButton" class="ghost-button" type="button">导入</button>

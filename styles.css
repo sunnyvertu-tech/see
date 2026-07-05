@@ -44,6 +44,8 @@ select {
 .sidebar {
   position: sticky;
   top: 0;
+  display: flex;
+  flex-direction: column;
   align-self: start;
   height: 100vh;
   padding: 22px 20px;
@@ -84,6 +86,11 @@ select {
   gap: 10px;
 }
 
+.side-nav {
+  flex: 1;
+  align-content: start;
+}
+
 .side-section-title {
   display: flex;
   align-items: center;
@@ -93,6 +100,30 @@ select {
   border-radius: 10px;
   color: #4d5352;
   background: rgba(89, 92, 255, 0.1);
+  font-weight: 800;
+}
+
+.side-action {
+  width: 100%;
+  border: 0;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+}
+
+.side-action:hover,
+.sidebar-logout:hover {
+  background: rgba(49, 95, 63, 0.12);
+}
+
+.sidebar-logout {
+  width: 100%;
+  min-height: 42px;
+  border: 0;
+  border-radius: 10px;
+  color: var(--green-deep);
+  background: rgba(255, 255, 255, 0.68);
+  cursor: pointer;
   font-weight: 800;
 }
 
@@ -652,6 +683,8 @@ dialog::backdrop {
 
   .sidebar {
     position: static;
+    display: grid;
+    gap: 14px;
     height: auto;
     padding: 16px 18px;
     border-right: 0;
@@ -669,6 +702,12 @@ dialog::backdrop {
 
   .view-tab {
     text-align: center;
+  }
+
+  .sidebar-logout {
+    width: auto;
+    justify-self: start;
+    padding: 0 16px;
   }
 
   .workspace {
