@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.hechuan.sales-system-demo</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/zsh</string>
+    <string>/Users/hechuan/Documents/Codex/2026-07-05/new-chat/outputs/sales-system-demo/start-local-server.sh</string>
+  </array>
+  <key>RunAtLoad</key>
+  <true/>
+  <key>KeepAlive</key>
+  <true/>
+  <key>WorkingDirectory</key>
+  <string>/Users/hechuan/Documents/Codex/2026-07-05/new-chat/outputs/sales-system-demo</string>
+  <key>StandardOutPath</key>
+  <string>/Users/hechuan/Documents/Codex/2026-07-05/new-chat/outputs/sales-system-demo/server.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/hechuan/Documents/Codex/2026-07-05/new-chat/outputs/sales-system-demo/server.err.log</string>
+</dict>
+</plist>
