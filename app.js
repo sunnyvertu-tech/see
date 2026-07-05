@@ -74,6 +74,9 @@ const loginForm = document.querySelector("#loginForm");
 const loginError = document.querySelector("#loginError");
 const tableBody = document.querySelector("#tableBody");
 const viewButtons = document.querySelectorAll(".view-tab");
+const salesNavSection = document.querySelector("#salesNavSection");
+const salesMenuToggle = document.querySelector("#salesMenuToggle");
+const salesMenuPanel = document.querySelector("#salesMenuPanel");
 const currentUserLabel = document.querySelector("#currentUserLabel");
 const addUserButton = document.querySelector("#addUserButton");
 const logoutButton = document.querySelector("#logoutButton");
@@ -309,6 +312,7 @@ function renderPermissionState() {
   document.querySelector("#exportButton").hidden = !canUse("exportData");
 
   const views = allowedViews();
+  salesNavSection.hidden = views.length === 0;
   if (!views.includes(currentView)) currentView = views[0] || "";
 
   viewButtons.forEach((button) => {
@@ -474,6 +478,12 @@ viewButtons.forEach((button) => {
     currentView = button.dataset.view;
     renderTable();
   });
+});
+
+salesMenuToggle.addEventListener("click", () => {
+  const expanded = salesNavSection.classList.toggle("expanded");
+  salesMenuToggle.setAttribute("aria-expanded", String(expanded));
+  salesMenuPanel.classList.toggle("collapsed", !expanded);
 });
 
 function fillPermissionForm() {

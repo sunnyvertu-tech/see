@@ -103,12 +103,30 @@ select {
   font-weight: 800;
 }
 
+.side-section-title span:nth-child(2) {
+  min-width: 0;
+}
+
 .side-action {
   width: 100%;
   border: 0;
   cursor: pointer;
   text-align: left;
   font: inherit;
+}
+
+.side-chevron {
+  margin-left: auto;
+  font-size: 20px;
+  transition: transform 0.16s ease;
+}
+
+.sales-nav-section.expanded .side-chevron {
+  transform: rotate(90deg);
+}
+
+.view-tabs.collapsed {
+  display: none;
 }
 
 .side-action:hover,

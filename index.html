@@ -42,12 +42,13 @@
           <strong>销售管理</strong>
         </div>
         <nav class="side-nav">
-          <div class="side-section">
-            <div class="side-section-title">
+          <div class="side-section sales-nav-section" id="salesNavSection">
+            <button class="side-section-title side-action" id="salesMenuToggle" type="button" aria-expanded="false">
               <span class="side-icon">销</span>
               <span>销售管理</span>
-            </div>
-            <div class="view-tabs" aria-label="销售管理切换">
+              <span class="side-chevron">›</span>
+            </button>
+            <div class="view-tabs collapsed" id="salesMenuPanel" aria-label="销售管理切换">
               <button class="view-tab" data-view="sales" type="button">销售</button>
               <button class="view-tab active" data-view="stock" type="button">库存</button>
             </div>
