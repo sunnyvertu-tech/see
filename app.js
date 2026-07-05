@@ -23,25 +23,50 @@ let items = JSON.parse(localStorage.getItem("sales-demo-items") || "null") || se
 let sortKey = "date";
 let sortDir = "desc";
 let currentView = "stock";
+const featureModules = [
+  { key: "stock", label: "库存" },
+  { key: "sales", label: "销售" },
+  { key: "addStock", label: "新增库存" },
+  { key: "addSales", label: "新增销售" },
+  { key: "refreshPage", label: "刷新" },
+  { key: "importData", label: "导入" },
+  { key: "exportData", label: "导出" },
+  { key: "sellItem", label: "售卖登记" },
+  { key: "deleteItem", label: "删除商品" },
+  { key: "userManage", label: "用户管理" }
+];
+const allFeaturePermissions = Object.fromEntries(featureModules.map((feature) => [feature.key, true]));
+const defaultRolePermissions = {
+  super_admin: { ...allFeaturePermissions },
+  manager: { ...allFeaturePermissions, userManage: false },
+  employee: {
+    stock: true,
+    sales: true,
+    addStock: false,
+    addSales: true,
+    refreshPage: true,
+    importData: false,
+    exportData: true,
+    sellItem: true,
+    deleteItem: false,
+    userManage: false
+  }
+};
 const defaultUsers = [
-  { username: "admin", password: "admin123", role: "super_admin", permissions: { stock: true, sales: true } },
+  { username: "admin", password: "admin123", role: "super_admin", permissions: { ...allFeaturePermissions } },
   { username: "manager", password: "123456", role: "manager" },
   { username: "employee", password: "123456", role: "employee" },
-  { username: "母彬", password: "123456", role: "employee", permissions: { stock: true, sales: true } },
-  { username: "叶美", password: "123456", role: "employee", permissions: { stock: true, sales: true } },
-  { username: "陈梦雪", password: "123456", role: "employee", permissions: { stock: true, sales: true } },
-  { username: "肖丽", password: "123456", role: "employee", permissions: { stock: true, sales: true } },
-  { username: "贾思懿", password: "123456", role: "employee", permissions: { stock: true, sales: true } },
-  { username: "soso", password: "123456", role: "employee", permissions: { stock: true, sales: true } }
+  { username: "母彬", password: "123456", role: "employee", permissions: { ...defaultRolePermissions.employee } },
+  { username: "叶美", password: "123456", role: "employee", permissions: { ...defaultRolePermissions.employee } },
+  { username: "陈梦雪", password: "123456", role: "employee", permissions: { ...defaultRolePermissions.employee } },
+  { username: "肖丽", password: "123456", role: "employee", permissions: { ...defaultRolePermissions.employee } },
+  { username: "贾思懿", password: "123456", role: "employee", permissions: { ...defaultRolePermissions.employee } },
+  { username: "soso", password: "123456", role: "employee", permissions: { ...defaultRolePermissions.employee } }
 ];
 let users = JSON.parse(localStorage.getItem("sales-demo-users") || "null") || [];
 let currentUser = null;
 let currentRole = "";
-let permissions = JSON.parse(localStorage.getItem("sales-demo-permissions") || "null") || {
-  super_admin: { stock: true, sales: true },
-  manager: { stock: true, sales: true },
-  employee: { stock: true, sales: false }
-};
+let permissions = JSON.parse(localStorage.getItem("sales-demo-permissions") || "null") || defaultRolePermissions;
 
 const appShell = document.querySelector(".app-shell");
 const loginScreen = document.querySelector("#loginScreen");
@@ -56,6 +81,9 @@ const userDialog = document.querySelector("#userDialog");
 const userForm = document.querySelector("#userForm");
 const userList = document.querySelector("#userList");
 const userCount = document.querySelector("#userCount");
+const newUserPermissions = document.querySelector("#newUserPermissions");
+const managerPermissions = document.querySelector("#managerPermissions");
+const employeePermissions = document.querySelector("#employeePermissions");
 const itemForm = document.querySelector("#itemForm");
 const stockDialog = document.querySelector("#stockDialog");
 const addStockButton = document.querySelector("#addStockButton");
@@ -82,6 +110,25 @@ function saveUsers() {
   localStorage.setItem("sales-demo-users", JSON.stringify(users));
 }
 
+function normalizePermissionSet(source = {}, role = "employee") {
+  const fallback = role === "super_admin" ? allFeaturePermissions : defaultRolePermissions[role] || defaultRolePermissions.employee;
+  return Object.fromEntries(featureModules.map((feature) => [feature.key, Boolean(source[feature.key] ?? fallback[feature.key])]));
+}
+
+function normalizePermissions() {
+  permissions = {
+    super_admin: { ...allFeaturePermissions },
+    manager: normalizePermissionSet(permissions.manager, "manager"),
+    employee: normalizePermissionSet(permissions.employee, "employee")
+  };
+  users = users.map((user) => ({
+    ...user,
+    permissions: user.permissions ? normalizePermissionSet(user.permissions, user.role) : undefined
+  }));
+  savePermissions();
+  saveUsers();
+}
+
 function mergeDefaultUsers() {
   const existingNames = new Set(users.map((user) => user.username));
   defaultUsers.forEach((user) => {
@@ -100,10 +147,14 @@ function profitOf(item) {
   return item.sold ? Number(item.salePrice || 0) - Number(item.cost || 0) : 0;
 }
 
-function canView(view) {
+function canUse(feature) {
   if (currentRole === "super_admin") return true;
-  if (currentUser?.permissions) return Boolean(currentUser.permissions[view]);
-  return Boolean(permissions[currentRole]?.[view]);
+  if (currentUser?.permissions) return Boolean(currentUser.permissions[feature]);
+  return Boolean(permissions[currentRole]?.[feature]);
+}
+
+function canView(view) {
+  return canUse(view);
 }
 
 function allowedViews() {
@@ -127,15 +178,31 @@ function roleName(role) {
   }[role] || role;
 }
 
+function renderPermissionCheckboxes(container, namePrefix, values = {}) {
+  container.innerHTML = featureModules.map((feature) => `
+    <label class="permission-chip">
+      <input name="${namePrefix}-${feature.key}" type="checkbox" ${values[feature.key] ? "checked" : ""} />
+      <span>${feature.label}</span>
+    </label>
+  `).join("");
+}
+
+function readPermissionCheckboxes(namePrefix) {
+  return Object.fromEntries(featureModules.map((feature) => [
+    feature.key,
+    Boolean(userForm.elements[`${namePrefix}-${feature.key}`]?.checked)
+  ]));
+}
+
 function renderUsers() {
   userCount.textContent = `${users.length} 人`;
   userList.innerHTML = users.map((user) => {
     const isCurrent = currentUser?.username === user.username;
     const isLastAdmin = user.role === "super_admin" && users.filter((entry) => entry.role === "super_admin").length === 1;
     const canDelete = !isCurrent && !isLastAdmin;
-    const stockText = user.permissions?.stock ?? permissions[user.role]?.stock ? "库存" : "";
-    const salesText = user.permissions?.sales ?? permissions[user.role]?.sales ? "销售" : "";
-    const permissionText = [stockText, salesText].filter(Boolean).join(" / ") || "无权限";
+    const userPermissions = normalizePermissionSet(user.permissions, user.role);
+    const enabledFeatures = featureModules.filter((feature) => userPermissions[feature.key]).map((feature) => feature.label);
+    const permissionText = enabledFeatures.length ? enabledFeatures.join(" / ") : "无权限";
 
     return `
       <article class="user-row">
@@ -235,7 +302,10 @@ function applySale(item, salePrice, seller) {
 
 function renderPermissionState() {
   currentUserLabel.textContent = currentUser ? `${currentUser.username} / ${roleName(currentRole)}` : "未登录";
-  addUserButton.hidden = currentRole !== "super_admin";
+  addUserButton.hidden = !canUse("userManage");
+  document.querySelector("#resetButton").hidden = !canUse("refreshPage");
+  document.querySelector("#importButton").hidden = !canUse("importData");
+  document.querySelector("#exportButton").hidden = !canUse("exportData");
 
   const views = allowedViews();
   if (!views.includes(currentView)) currentView = views[0] || "";
@@ -246,7 +316,7 @@ function renderPermissionState() {
     button.classList.toggle("active", view === currentView);
   });
 
-  addStockButton.hidden = !currentView || !canView(currentView);
+  addStockButton.hidden = !currentView || (currentView === "sales" ? !canUse("addSales") : !canUse("addStock"));
   addStockButton.textContent = currentView === "sales" ? "新增销售" : "新增库存";
 }
 
@@ -283,8 +353,8 @@ function renderTable() {
       <td>${item.sold ? formatNumber(profitOf(item)) : ""}</td>
       <td>${item.seller || ""}</td>
       <td>
-        <button class="link-button" data-action="sell" data-id="${item.id}">${item.sold ? "修改" : "售卖"}</button>
-        <button class="link-button danger" data-action="remove" data-id="${item.id}">删除</button>
+        ${canUse("sellItem") ? `<button class="link-button" data-action="sell" data-id="${item.id}">${item.sold ? "修改" : "售卖"}</button>` : ""}
+        ${canUse("deleteItem") ? `<button class="link-button danger" data-action="remove" data-id="${item.id}">删除</button>` : ""}
       </td>
     `;
     tableBody.append(row);
@@ -364,6 +434,7 @@ function toNumber(value) {
 }
 
 function importCsv(file) {
+  if (!canUse("importData")) return;
   const reader = new FileReader();
   reader.addEventListener("load", () => {
     const rows = parseCsv(String(reader.result || ""));
@@ -405,10 +476,9 @@ viewButtons.forEach((button) => {
 });
 
 function fillPermissionForm() {
-  userForm.elements["manager-stock"].checked = Boolean(permissions.manager?.stock);
-  userForm.elements["manager-sales"].checked = Boolean(permissions.manager?.sales);
-  userForm.elements["employee-stock"].checked = Boolean(permissions.employee?.stock);
-  userForm.elements["employee-sales"].checked = Boolean(permissions.employee?.sales);
+  renderPermissionCheckboxes(newUserPermissions, "new", normalizePermissionSet(defaultRolePermissions.employee, "employee"));
+  renderPermissionCheckboxes(managerPermissions, "manager", normalizePermissionSet(permissions.manager, "manager"));
+  renderPermissionCheckboxes(employeePermissions, "employee", normalizePermissionSet(permissions.employee, "employee"));
 }
 
 loginForm.addEventListener("submit", (event) => {
@@ -436,9 +506,8 @@ logoutButton.addEventListener("click", () => {
 });
 
 addUserButton.addEventListener("click", () => {
+  if (!canUse("userManage")) return;
   userForm.reset();
-  userForm.elements.stock.checked = true;
-  userForm.elements.sales.checked = false;
   fillPermissionForm();
   renderUsers();
   userDialog.showModal();
@@ -457,27 +526,16 @@ userForm.addEventListener("submit", (event) => {
     username,
     password: userForm.elements.password.value.trim(),
     role: userForm.elements.role.value,
-    permissions: {
-      stock: userForm.elements.stock.checked,
-      sales: userForm.elements.sales.checked
-    }
+    permissions: readPermissionCheckboxes("new")
   });
   saveUsers();
   permissions = {
-    super_admin: { stock: true, sales: true },
-    manager: {
-      stock: userForm.elements["manager-stock"].checked,
-      sales: userForm.elements["manager-sales"].checked
-    },
-    employee: {
-      stock: userForm.elements["employee-stock"].checked,
-      sales: userForm.elements["employee-sales"].checked
-    }
+    super_admin: { ...allFeaturePermissions },
+    manager: readPermissionCheckboxes("manager"),
+    employee: readPermissionCheckboxes("employee")
   };
   savePermissions();
   userForm.reset();
-  userForm.elements.stock.checked = true;
-  userForm.elements.sales.checked = false;
   fillPermissionForm();
   renderUsers();
   renderTable();
@@ -525,6 +583,7 @@ itemForm.addEventListener("submit", (event) => {
   const formData = new FormData(itemForm);
   const nextId = Math.max(0, ...items.map((item) => item.id)) + 1;
   const isSalesView = currentView === "sales";
+  if (isSalesView ? !canUse("addSales") : !canUse("addStock")) return;
   const vsn = formData.get("vsn").trim();
   const salePrice = isSalesView ? Number(formData.get("salePrice")) : 0;
   const seller = isSalesView ? formData.get("seller").trim() : "";
@@ -563,6 +622,7 @@ itemForm.addEventListener("submit", (event) => {
 });
 
 addStockButton.addEventListener("click", () => {
+  if (currentView === "sales" ? !canUse("addSales") : !canUse("addStock")) return;
   itemForm.reset();
   itemForm.elements.date.value = "2026-07-05";
   prepareStockDialog();
@@ -582,9 +642,11 @@ tableBody.addEventListener("click", (event) => {
   if (!button) return;
   const id = Number(button.dataset.id);
   if (button.dataset.action === "sell") {
+    if (!canUse("sellItem")) return;
     openSaleDialog(id);
   }
   if (button.dataset.action === "remove") {
+    if (!canUse("deleteItem")) return;
     items = items.filter((item) => item.id !== id);
     save();
     renderTable();
@@ -594,6 +656,7 @@ tableBody.addEventListener("click", (event) => {
 saleForm.addEventListener("submit", (event) => {
   if (event.submitter.value !== "confirm") return;
   event.preventDefault();
+  if (!canUse("sellItem")) return;
   const id = Number(saleForm.elements.id.value);
   items = items.map((item) => {
     if (item.id !== id) return item;
@@ -615,6 +678,7 @@ saleDialog.addEventListener("close", () => {
 });
 
 document.querySelector("#resetButton").addEventListener("click", () => {
+  if (!canUse("refreshPage")) return;
   const button = document.querySelector("#resetButton");
   button.textContent = "刷新中";
   button.disabled = true;
@@ -633,8 +697,12 @@ importInput.addEventListener("change", () => {
   importCsv(file);
 });
 
-document.querySelector("#exportButton").addEventListener("click", exportCsv);
+document.querySelector("#exportButton").addEventListener("click", () => {
+  if (!canUse("exportData")) return;
+  exportCsv();
+});
 
+normalizePermissions();
 mergeDefaultUsers();
 loadRememberedLogin();
 const lastLoginUser = localStorage.getItem("sales-demo-login-user");

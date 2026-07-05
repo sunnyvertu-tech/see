@@ -143,33 +143,23 @@
           </select>
         </label>
         <div class="permission-list">
-          <div class="permission-row header">
+          <div class="section-title compact-title">
             <span>新用户权限</span>
-            <span>库存</span>
-            <span>销售</span>
           </div>
-          <label class="permission-row">
-            <strong>允许访问</strong>
-            <input name="stock" type="checkbox" checked />
-            <input name="sales" type="checkbox" />
-          </label>
+          <div id="newUserPermissions" class="permission-grid"></div>
         </div>
         <div class="permission-list default-permissions">
-          <div class="permission-row header">
+          <div class="section-title compact-title">
             <span>默认角色权限</span>
-            <span>库存</span>
-            <span>销售</span>
           </div>
-          <label class="permission-row">
+          <div class="role-permission-block">
             <strong>主管</strong>
-            <input name="manager-stock" type="checkbox" />
-            <input name="manager-sales" type="checkbox" />
-          </label>
-          <label class="permission-row">
+            <div id="managerPermissions" class="permission-grid"></div>
+          </div>
+          <div class="role-permission-block">
             <strong>员工</strong>
-            <input name="employee-stock" type="checkbox" />
-            <input name="employee-sales" type="checkbox" />
-          </label>
+            <div id="employeePermissions" class="permission-grid"></div>
+          </div>
         </div>
         </section>
         <div class="dialog-actions">
