@@ -2,3 +2,7 @@ server.log
 server.err.log
 .DS_Store
 tools/
+cpolar-tunnel.log*
+cpolar-tunnel.pid
+cpolar-launch.log
+cpolar-launch.err.log

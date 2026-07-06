@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.hechuan.sales-system-cpolar</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/Users/hechuan/Documents/Codex/2026-07-05/new-chat/outputs/sales-system-demo/tools/cpolar/cpolar</string>
+    <string>http</string>
+    <string>-region=cn_vip</string>
+    <string>-log=/Users/hechuan/Documents/Codex/2026-07-05/new-chat/outputs/sales-system-demo/cpolar-tunnel.log</string>
+    <string>-log-level=INFO</string>
+    <string>-inspect-addr=127.0.0.1:4040</string>
+    <string>8088</string>
+  </array>
+  <key>RunAtLoad</key>
+  <true/>
+  <key>KeepAlive</key>
+  <true/>
+  <key>WorkingDirectory</key>
+  <string>/Users/hechuan/Documents/Codex/2026-07-05/new-chat/outputs/sales-system-demo</string>
+  <key>StandardOutPath</key>
+  <string>/Users/hechuan/Documents/Codex/2026-07-05/new-chat/outputs/sales-system-demo/cpolar-launch.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/hechuan/Documents/Codex/2026-07-05/new-chat/outputs/sales-system-demo/cpolar-launch.err.log</string>
+</dict>
+</plist>

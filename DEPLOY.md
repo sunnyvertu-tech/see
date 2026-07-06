@@ -54,4 +54,25 @@ cpolar 本地管理地址：
 
 `http://127.0.0.1:9200/`
 
+当前 cpolar 公网访问地址：
+
+`https://6f89c338.r21.vip.cpolar.cn/`
+
+当前电脑已通过 macOS 后台服务启动 cpolar：
+
+`com.hechuan.sales-system-cpolar`
+
+查看状态：
+
+```sh
+launchctl print gui/$(id -u)/com.hechuan.sales-system-cpolar
+```
+
+重新加载：
+
+```sh
+launchctl bootout gui/$(id -u) ./com.hechuan.sales-system-cpolar.plist
+launchctl bootstrap gui/$(id -u) ./com.hechuan.sales-system-cpolar.plist
+```
+
 注意：电脑关机、休眠、断网，公网地址都会无法访问。要长期稳定访问，需要保持这台电脑开机并保持本地服务和 cpolar 隧道运行。
