@@ -167,6 +167,12 @@ function dateKey(date) {
   return `${year}-${month}-${day}`;
 }
 
+function todayDate() {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return today;
+}
+
 function parseItemDate(value) {
   const [year, month, day] = String(value).split("-").map(Number);
   return new Date(year, month - 1, day);
@@ -174,12 +180,14 @@ function parseItemDate(value) {
 
 function shiftDate(date, days) {
   const next = new Date(date);
+  next.setHours(0, 0, 0, 0);
   next.setDate(next.getDate() + days);
   return next;
 }
 
 function startOfWeek(date) {
   const start = new Date(date);
+  start.setHours(0, 0, 0, 0);
   const day = start.getDay() || 7;
   start.setDate(start.getDate() - day + 1);
   return start;
@@ -200,13 +208,6 @@ function isBetweenDates(value, start, end) {
 
 function visibleSalesItems() {
   return items.filter((item) => item.sold).filter((item) => canViewAllData() || isOwnItem(item));
-}
-
-function latestSalesDate(list) {
-  return list.reduce((latest, item) => {
-    const itemDate = parseItemDate(item.date);
-    return !latest || itemDate > latest ? itemDate : latest;
-  }, null);
 }
 
 function sumSales(list) {
@@ -274,7 +275,7 @@ function renderPerformanceDashboard() {
   if (!shouldShowDashboard) return;
 
   const sales = visibleSalesItems();
-  const now = latestSalesDate(sales) || new Date();
+  const now = todayDate();
   const today = dateKey(now);
   const yesterday = dateKey(shiftDate(now, -1));
   const weekStart = startOfWeek(now);
@@ -311,7 +312,7 @@ function renderPerformanceDashboard() {
     { label: "同比", value: percentValue(todayAmount, yesterdayAmount) }
   ]);
 
-  document.querySelector("#yesterdayLabel").textContent = "昨日";
+  document.querySelector("#yesterdayLabel").textContent = `昨日（${yesterday}）`;
   document.querySelector("#yesterdayAmount").textContent = formatWan(yesterdayAmount);
   document.querySelector("#yesterdayGoal").textContent = `（目标: ${formatWan(salesGoals.day)}）`;
   document.querySelector("#yesterdayRate").textContent = `${yesterdayGoalRate}%`;
