@@ -537,6 +537,85 @@ function filteredItems() {
     });
 }
 
+function stockForSale() {
+  return items
+    .filter((item) => !item.sold)
+    .filter((item) => canViewAllData() || isOwnItem(item));
+}
+
+function uniqueValues(list, key) {
+  return [...new Set(list.map((item) => item[key]).filter(Boolean))]
+    .sort((a, b) => String(a).localeCompare(String(b), "zh-Hans-CN"));
+}
+
+function fillSelect(select, values, placeholder) {
+  select.innerHTML = [
+    `<option value="">${escapeHtml(placeholder)}</option>`,
+    ...values.map((value) => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`)
+  ].join("");
+}
+
+function setFieldMode(fieldName, useSelect) {
+  const input = itemForm.elements[fieldName];
+  const select = itemForm.elements[`${fieldName}Select`];
+  input.classList.toggle("hidden", useSelect);
+  select.classList.toggle("hidden", !useSelect);
+  input.required = !useSelect;
+  select.required = useSelect;
+}
+
+function selectedStockItems() {
+  const model = itemForm.elements.modelSelect.value;
+  const style = itemForm.elements.styleSelect.value;
+  return stockForSale()
+    .filter((item) => !model || item.model === model)
+    .filter((item) => !style || item.style === style);
+}
+
+function applySelectedInventoryItem() {
+  const vsn = itemForm.elements.vsnSelect.value;
+  const item = stockForSale().find((entry) => entry.vsn === vsn);
+  if (!item) return;
+  itemForm.elements.modelSelect.value = item.model;
+  itemForm.elements.styleSelect.value = item.style;
+  itemForm.elements.vsnSelect.setCustomValidity("");
+  itemForm.elements.model.value = item.model;
+  itemForm.elements.style.value = item.style;
+  itemForm.elements.vsn.value = item.vsn;
+  itemForm.elements.warehouse.value = item.warehouse;
+  itemForm.elements.price.value = item.price;
+  itemForm.elements.cost.value = item.cost;
+}
+
+function refreshSalesPickers() {
+  const stock = stockForSale();
+  const modelSelect = itemForm.elements.modelSelect;
+  const styleSelect = itemForm.elements.styleSelect;
+  const vsnSelect = itemForm.elements.vsnSelect;
+  const currentModel = modelSelect.value;
+  const currentStyle = styleSelect.value;
+  const models = uniqueValues(stock, "model");
+  fillSelect(modelSelect, models, stock.length ? "请选择型号" : "暂无可售库存");
+  modelSelect.value = models.includes(currentModel) ? currentModel : "";
+
+  const styles = uniqueValues(stock.filter((item) => !modelSelect.value || item.model === modelSelect.value), "style");
+  fillSelect(styleSelect, styles, modelSelect.value ? "请选择款式" : "请先选择型号");
+  styleSelect.value = styles.includes(currentStyle) ? currentStyle : "";
+
+  const candidates = selectedStockItems();
+  const vsnOptions = candidates.map((item) => `${item.vsn}｜${item.warehouse}｜成本 ${formatNumber(item.cost)}`);
+  vsnSelect.innerHTML = [
+    `<option value="">${escapeHtml(candidates.length ? "请选择 VSN" : "暂无匹配库存")}</option>`,
+    ...candidates.map((item, index) => `<option value="${escapeHtml(item.vsn)}">${escapeHtml(vsnOptions[index])}</option>`)
+  ].join("");
+  if (candidates.length === 1) {
+    vsnSelect.value = candidates[0].vsn;
+    applySelectedInventoryItem();
+  } else {
+    itemForm.elements.vsn.value = "";
+  }
+}
+
 function renderMetrics(list) {
   metricsSection.classList.toggle("hidden", !currentView);
   tableZone.classList.toggle("hidden", !currentView);
@@ -596,10 +675,19 @@ function prepareStockDialog() {
   const isSalesView = currentView === "sales";
   stockDialog.querySelector(".dialog-head strong").textContent = isSalesView ? "新增销售" : "新增库存";
   stockSubmitButton.textContent = isSalesView ? "添加到销售" : "添加到库存";
+  ["model", "style", "vsn"].forEach((field) => setFieldMode(field, isSalesView));
   itemForm.querySelector(".sales-only-field").classList.toggle("hidden", !isSalesView);
   itemForm.elements.salePrice.required = isSalesView;
   itemForm.elements.seller.required = isSalesView;
   itemForm.elements.seller.value = isSalesView ? currentUser?.username || "" : "";
+  if (isSalesView) {
+    refreshSalesPickers();
+    itemForm.elements.price.readOnly = true;
+    itemForm.elements.cost.readOnly = true;
+  } else {
+    itemForm.elements.price.readOnly = false;
+    itemForm.elements.cost.readOnly = false;
+  }
 }
 
 function renderTable() {
@@ -873,10 +961,16 @@ itemForm.addEventListener("submit", (event) => {
   const nextId = Math.max(0, ...items.map((item) => item.id)) + 1;
   const isSalesView = currentView === "sales";
   if (isSalesView ? !canUse("addSales") : !canUse("addStock")) return;
-  const vsn = cleanText(formData.get("vsn"), 40);
+  const vsn = cleanText(isSalesView ? formData.get("vsnSelect") : formData.get("vsn"), 40);
   const salePrice = isSalesView ? cleanMoney(formData.get("salePrice")) : 0;
   const seller = isSalesView ? cleanText(formData.get("seller"), 40) : "";
   const inventoryItem = isSalesView ? items.find((item) => !item.sold && item.vsn === vsn) : null;
+
+  if (isSalesView && !inventoryItem) {
+    itemForm.elements.vsnSelect.setCustomValidity("请选择库存中已有的 VSN");
+    itemForm.reportValidity();
+    return;
+  }
 
   if (inventoryItem) {
     items = items.map((item) => {
@@ -923,7 +1017,20 @@ itemForm.addEventListener("click", (event) => {
   if (!closeButton) return;
   itemForm.elements.salePrice.required = false;
   itemForm.elements.seller.required = false;
+  ["model", "style", "vsn"].forEach((field) => setFieldMode(field, false));
   stockDialog.close();
+});
+
+itemForm.elements.modelSelect.addEventListener("change", () => {
+  itemForm.elements.styleSelect.value = "";
+  refreshSalesPickers();
+});
+
+itemForm.elements.styleSelect.addEventListener("change", refreshSalesPickers);
+
+itemForm.elements.vsnSelect.addEventListener("change", () => {
+  itemForm.elements.vsnSelect.setCustomValidity("");
+  applySelectedInventoryItem();
 });
 
 tableBody.addEventListener("click", (event) => {
