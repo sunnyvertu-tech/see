@@ -12,6 +12,16 @@
 
 `http://127.0.0.1:8088/`
 
+后台公网服务实际读取目录：
+
+`/private/tmp/sales-system-demo-public`
+
+每次修改 `index.html`、`app.js`、`styles.css` 后，需要同步到公网服务目录：
+
+```sh
+./sync-public.sh
+```
+
 局域网访问地址需要使用当前电脑的局域网 IP，例如：
 
 `http://192.168.1.237:8088/`

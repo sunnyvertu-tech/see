@@ -19,7 +19,77 @@ const seedItems = [
   { id: 18, date: "2026-06-26", model: "ALPHAFOLD", style: "红色鳄鱼皮", vsn: "25002586", warehouse: "成都", price: 54800, cost: 35620, sold: true, salePrice: 41064, seller: "肖丽" }
 ];
 
-let items = JSON.parse(localStorage.getItem("sales-demo-items") || "null") || seedItems;
+function readStoredJson(key, fallback) {
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : fallback;
+  } catch {
+    localStorage.removeItem(key);
+    return fallback;
+  }
+}
+
+function readStoredArray(key, fallback) {
+  const value = readStoredJson(key, fallback);
+  return Array.isArray(value) ? value : fallback;
+}
+
+function cleanText(value, maxLength = 80) {
+  return String(value ?? "").trim().slice(0, maxLength);
+}
+
+function escapeHtml(value) {
+  return String(value ?? "").replace(/[&<>"']/g, (char) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  }[char]));
+}
+
+function cleanMoney(value) {
+  const number = Number(value);
+  return Number.isFinite(number) && number > 0 ? number : 0;
+}
+
+function cleanDate(value) {
+  const normalized = cleanText(value, 20).replaceAll("/", "-");
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(normalized)) return dateKey(todayDate());
+  const parsed = parseItemDate(normalized);
+  return dateKey(parsed) === normalized ? normalized : dateKey(todayDate());
+}
+
+function normalizeItem(item = {}, index = 0) {
+  const sold = Boolean(item.sold);
+  const warehouse = cleanText(item.warehouse, 20);
+  return {
+    id: Number.isFinite(Number(item.id)) ? Number(item.id) : Date.now() + index,
+    date: cleanDate(item.date),
+    model: cleanText(item.model),
+    style: cleanText(item.style, 120),
+    vsn: cleanText(item.vsn, 40),
+    warehouse: ["成都", "贵阳"].includes(warehouse) ? warehouse : "成都",
+    price: cleanMoney(item.price),
+    cost: cleanMoney(item.cost),
+    sold,
+    salePrice: sold ? cleanMoney(item.salePrice) : 0,
+    seller: sold ? cleanText(item.seller || item.soldBy, 40) : "",
+    owner: cleanText(item.owner, 40),
+    soldBy: sold ? cleanText(item.soldBy, 40) : ""
+  };
+}
+
+function normalizeUser(user = {}) {
+  return {
+    username: cleanText(user.username, 40),
+    password: cleanText(user.password, 80),
+    role: ["super_admin", "manager", "employee"].includes(user.role) ? user.role : "employee",
+    permissions: user.permissions
+  };
+}
+
+let items = readStoredArray("sales-demo-items", seedItems).map(normalizeItem);
 let sortKey = "date";
 let sortDir = "desc";
 let currentView = "";
@@ -63,10 +133,10 @@ const defaultUsers = [
   { username: "贾思懿", password: "123456", role: "employee", permissions: { ...defaultRolePermissions.employee } },
   { username: "soso", password: "123456", role: "employee", permissions: { ...defaultRolePermissions.employee } }
 ];
-let users = JSON.parse(localStorage.getItem("sales-demo-users") || "null") || [];
+let users = readStoredArray("sales-demo-users", []).map(normalizeUser).filter((user) => user.username && user.password);
 let currentUser = null;
 let currentRole = "";
-let permissions = JSON.parse(localStorage.getItem("sales-demo-permissions") || "null") || defaultRolePermissions;
+let permissions = readStoredJson("sales-demo-permissions", defaultRolePermissions);
 
 const appShell = document.querySelector(".app-shell");
 const loginScreen = document.querySelector("#loginScreen");
@@ -260,7 +330,7 @@ function renderRank(containerId, list) {
     const width = max ? Math.max(8, Math.round((rank.value / max) * 100)) : 0;
     return `
       <div class="bar-row">
-        <span>${rank.name}</span>
+        <span>${escapeHtml(rank.name)}</span>
         <span class="bar-track"><i style="--bar-width: ${width}%; --bar-color: ${chartColors[index % chartColors.length]}"></i></span>
         <strong>${formatWan(rank.value)}</strong>
       </div>
@@ -404,20 +474,20 @@ function renderUsers() {
     return `
       <article class="user-row">
         <div>
-          <strong>${user.username}</strong>
-          <span>${roleName(user.role)} · ${permissionText}</span>
+          <strong>${escapeHtml(user.username)}</strong>
+          <span>${escapeHtml(roleName(user.role))} · ${escapeHtml(permissionText)}</span>
         </div>
         <div class="user-row-actions">
           <button
             class="link-button"
             data-action="reset-user-password"
-            data-username="${user.username}"
+            data-username="${escapeHtml(user.username)}"
             type="button"
           >重置密码</button>
           <button
             class="link-button danger"
             data-action="delete-user"
-            data-username="${user.username}"
+            data-username="${escapeHtml(user.username)}"
             type="button"
             ${canDelete ? "" : "disabled"}
           >删除</button>
@@ -444,10 +514,10 @@ function showLogin() {
 }
 
 function loadRememberedLogin() {
-  const remembered = JSON.parse(localStorage.getItem("sales-demo-remember") || "null");
+  const remembered = readStoredJson("sales-demo-remember", null);
   if (!remembered) return;
-  loginForm.elements.username.value = remembered.username || "";
-  loginForm.elements.password.value = remembered.password || "";
+  loginForm.elements.username.value = cleanText(remembered.username, 40);
+  loginForm.elements.password.value = cleanText(remembered.password, 80);
   loginForm.elements.remember.checked = true;
 }
 
@@ -493,8 +563,8 @@ function applySale(item, salePrice, seller) {
   return {
     ...item,
     sold: true,
-    salePrice,
-    seller,
+    salePrice: cleanMoney(salePrice),
+    seller: cleanText(seller, 40),
     soldBy: currentUser?.username || "",
     owner: item.owner || currentUser?.username || ""
   };
@@ -542,11 +612,11 @@ function renderTable() {
   list.forEach((item) => {
     const row = document.createElement("tr");
     row.innerHTML = `
-      <td>${item.date.replaceAll("-", "/")}</td>
-      <td>${item.model}</td>
-      <td>${item.style}</td>
-      <td>${item.vsn}</td>
-      <td>${item.warehouse}</td>
+      <td>${escapeHtml(item.date.replaceAll("-", "/"))}</td>
+      <td>${escapeHtml(item.model)}</td>
+      <td>${escapeHtml(item.style)}</td>
+      <td>${escapeHtml(item.vsn)}</td>
+      <td>${escapeHtml(item.warehouse)}</td>
       <td>${formatNumber(item.price)}</td>
       <td>${formatNumber(item.cost)}</td>
       <td>
@@ -554,7 +624,7 @@ function renderTable() {
       </td>
       <td>${item.sold ? formatNumber(item.salePrice) : ""}</td>
       <td>${item.sold ? formatNumber(profitOf(item)) : ""}</td>
-      <td>${item.seller || ""}</td>
+      <td>${escapeHtml(item.seller || "")}</td>
       <td>
         ${canUse("sellItem") ? `<button class="link-button" data-action="sell" data-id="${item.id}">${item.sold ? "修改" : "售卖"}</button>` : ""}
         ${canUse("deleteItem") ? `<button class="link-button danger" data-action="remove" data-id="${item.id}">删除</button>` : ""}
@@ -644,10 +714,15 @@ function importCsv(file) {
     const headers = rows[0] || [];
     const headerMap = new Map(headers.map((header, index) => [header.trim(), index]));
     const getCell = (row, name) => row[headerMap.get(name)] || "";
+    if (!headerMap.has("VSN") || !headerMap.has("日期")) {
+      window.alert("导入失败：CSV 需要包含 日期 和 VSN 列");
+      importInput.value = "";
+      return;
+    }
     items = rows.slice(1).map((row, index) => {
       const soldText = getCell(row, "售卖").trim();
       const sold = soldText === "是" || soldText.toLowerCase() === "yes";
-      return {
+      return normalizeItem({
         id: Date.now() + index,
         date: getCell(row, "日期").trim().replaceAll("/", "-"),
         model: getCell(row, "型号").trim(),
@@ -661,8 +736,8 @@ function importCsv(file) {
         seller: sold ? (getCell(row, "销售员") || getCell(row, "销售人")).trim() : "",
         owner: currentUser?.username || "",
         soldBy: sold ? currentUser?.username || "" : ""
-      };
-    });
+      }, index);
+    }).filter((item) => item.date && item.vsn);
     save();
     renderTable();
     importInput.value = "";
@@ -729,19 +804,19 @@ addUserButton.addEventListener("click", () => {
 
 userForm.addEventListener("submit", (event) => {
   event.preventDefault();
-  const username = userForm.elements.username.value.trim();
+  const username = cleanText(userForm.elements.username.value, 40);
   if (users.some((user) => user.username === username)) {
     userForm.elements.username.setCustomValidity("账号已存在");
     userForm.reportValidity();
     return;
   }
   userForm.elements.username.setCustomValidity("");
-  users.push({
+  users.push(normalizeUser({
     username,
-    password: userForm.elements.password.value.trim(),
+    password: userForm.elements.password.value,
     role: userForm.elements.role.value,
     permissions: readPermissionCheckboxes("new")
-  });
+  }));
   saveUsers();
   permissions = {
     super_admin: { ...allFeaturePermissions },
@@ -784,7 +859,7 @@ userForm.addEventListener("click", (event) => {
   if (localStorage.getItem("sales-demo-login-user") === username) {
     localStorage.removeItem("sales-demo-login-user");
   }
-  const remembered = JSON.parse(localStorage.getItem("sales-demo-remember") || "null");
+  const remembered = readStoredJson("sales-demo-remember", null);
   if (remembered?.username === username) {
     localStorage.removeItem("sales-demo-remember");
   }
@@ -798,9 +873,9 @@ itemForm.addEventListener("submit", (event) => {
   const nextId = Math.max(0, ...items.map((item) => item.id)) + 1;
   const isSalesView = currentView === "sales";
   if (isSalesView ? !canUse("addSales") : !canUse("addStock")) return;
-  const vsn = formData.get("vsn").trim();
-  const salePrice = isSalesView ? Number(formData.get("salePrice")) : 0;
-  const seller = isSalesView ? formData.get("seller").trim() : "";
+  const vsn = cleanText(formData.get("vsn"), 40);
+  const salePrice = isSalesView ? cleanMoney(formData.get("salePrice")) : 0;
+  const seller = isSalesView ? cleanText(formData.get("seller"), 40) : "";
   const inventoryItem = isSalesView ? items.find((item) => !item.sold && item.vsn === vsn) : null;
 
   if (inventoryItem) {
@@ -810,26 +885,26 @@ itemForm.addEventListener("submit", (event) => {
     });
   } else {
     items = [
-      {
+      normalizeItem({
         id: nextId,
         date: formData.get("date"),
-        model: formData.get("model").trim(),
-        style: formData.get("style").trim(),
+        model: formData.get("model"),
+        style: formData.get("style"),
         vsn,
-        warehouse: formData.get("warehouse").trim(),
-        price: Number(formData.get("price")),
-        cost: Number(formData.get("cost")),
+        warehouse: formData.get("warehouse"),
+        price: formData.get("price"),
+        cost: formData.get("cost"),
         sold: isSalesView,
         salePrice,
         seller,
         owner: currentUser?.username || "",
         soldBy: isSalesView ? currentUser?.username || "" : ""
-      },
+      }),
       ...items
     ];
   }
   itemForm.reset();
-  itemForm.elements.date.value = "2026-07-05";
+  itemForm.elements.date.value = dateKey(todayDate());
   stockDialog.close();
   save();
   renderTable();
@@ -838,7 +913,7 @@ itemForm.addEventListener("submit", (event) => {
 addStockButton.addEventListener("click", () => {
   if (currentView === "sales" ? !canUse("addSales") : !canUse("addStock")) return;
   itemForm.reset();
-  itemForm.elements.date.value = "2026-07-05";
+  itemForm.elements.date.value = dateKey(todayDate());
   prepareStockDialog();
   stockDialog.showModal();
 });
@@ -868,13 +943,15 @@ tableBody.addEventListener("click", (event) => {
 });
 
 saleForm.addEventListener("submit", (event) => {
-  if (event.submitter.value !== "confirm") return;
+  if (event.submitter?.value !== "confirm") return;
   event.preventDefault();
   if (!canUse("sellItem")) return;
   const id = Number(saleForm.elements.id.value);
+  const salePrice = cleanMoney(saleForm.elements.salePrice.value);
+  const seller = cleanText(saleForm.elements.seller.value, 40);
   items = items.map((item) => {
     if (item.id !== id) return item;
-    return applySale(item, Number(saleForm.elements.salePrice.value), saleForm.elements.seller.value.trim());
+    return applySale(item, salePrice, seller);
   });
   save();
   saleDialog.close();

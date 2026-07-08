@@ -7,15 +7,19 @@
   <string>com.hechuan.sales-system-demo</string>
   <key>ProgramArguments</key>
   <array>
-    <string>/bin/zsh</string>
-    <string>/Users/hechuan/Documents/Codex/2026-07-05/new-chat/outputs/sales-system-demo/start-local-server.sh</string>
+    <string>/usr/bin/python3</string>
+    <string>-m</string>
+    <string>http.server</string>
+    <string>--bind</string>
+    <string>0.0.0.0</string>
+    <string>8088</string>
   </array>
   <key>RunAtLoad</key>
   <true/>
   <key>KeepAlive</key>
   <true/>
   <key>WorkingDirectory</key>
-  <string>/Users/hechuan/Documents/Codex/2026-07-05/new-chat/outputs/sales-system-demo</string>
+  <string>/private/tmp/sales-system-demo-public</string>
   <key>StandardOutPath</key>
   <string>/Users/hechuan/Documents/Codex/2026-07-05/new-chat/outputs/sales-system-demo/server.log</string>
   <key>StandardErrorPath</key>
