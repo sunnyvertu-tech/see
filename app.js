@@ -143,6 +143,7 @@ const appShell = document.querySelector(".app-shell");
 const loginScreen = document.querySelector("#loginScreen");
 const loginForm = document.querySelector("#loginForm");
 const loginError = document.querySelector("#loginError");
+const tableHead = document.querySelector("#tableHead");
 const tableBody = document.querySelector("#tableBody");
 const tableFoot = document.querySelector("#tableFoot");
 const viewButtons = document.querySelectorAll("[data-view]");
@@ -733,19 +734,28 @@ function prepareStockDialog() {
   }
 }
 
+function renderTableHead() {
+  const headers = currentView === "sales"
+    ? ["日期", "销售员", "型号", "款式", "VSN", "库存仓库", "原价", "成本", "售卖", "售卖价", "利润", "操作"]
+    : ["日期", "型号", "款式", "VSN", "库存仓库", "原价", "成本", "售卖", "售卖价", "利润", "操作"];
+  tableHead.innerHTML = headers.map((header) => `<th>${header}</th>`).join("");
+}
+
 function renderTable() {
   renderPermissionState();
   const list = filteredItems();
   renderPerformanceDashboard();
   renderMetrics(list);
+  renderTableHead();
   tableBody.innerHTML = "";
   tableFoot.innerHTML = "";
 
   list.forEach((item) => {
     const row = document.createElement("tr");
+    const salespersonCell = currentView === "sales" ? `<td>${escapeHtml(item.seller || "")}</td>` : "";
     row.innerHTML = `
       <td>${escapeHtml(item.date.replaceAll("-", "/"))}</td>
-      <td>${escapeHtml(item.seller || "")}</td>
+      ${salespersonCell}
       <td>${escapeHtml(item.model)}</td>
       <td>${escapeHtml(item.style)}</td>
       <td>${escapeHtml(item.vsn)}</td>
