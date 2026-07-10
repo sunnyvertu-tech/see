@@ -144,6 +144,7 @@ const loginScreen = document.querySelector("#loginScreen");
 const loginForm = document.querySelector("#loginForm");
 const loginError = document.querySelector("#loginError");
 const tableBody = document.querySelector("#tableBody");
+const tableFoot = document.querySelector("#tableFoot");
 const viewButtons = document.querySelectorAll("[data-view]");
 const companyPerformanceButton = document.querySelector("#companyPerformanceButton");
 const salesNavSection = document.querySelector("#salesNavSection");
@@ -738,6 +739,7 @@ function renderTable() {
   renderPerformanceDashboard();
   renderMetrics(list);
   tableBody.innerHTML = "";
+  tableFoot.innerHTML = "";
 
   list.forEach((item) => {
     const row = document.createElement("tr");
@@ -762,6 +764,20 @@ function renderTable() {
     `;
     tableBody.append(row);
   });
+
+  if (currentView === "sales") {
+    const salesTotal = list.reduce((sum, item) => sum + Number(item.salePrice || 0), 0);
+    const profitTotal = list.reduce((sum, item) => sum + profitOf(item), 0);
+    tableFoot.innerHTML = `
+      <tr class="summary-row">
+        <td colspan="7">总计</td>
+        <td>${list.length} 件</td>
+        <td>${formatNumber(salesTotal)}</td>
+        <td>${formatNumber(profitTotal)}</td>
+        <td colspan="2"></td>
+      </tr>
+    `;
+  }
 }
 
 function openSaleDialog(id) {

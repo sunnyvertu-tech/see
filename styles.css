@@ -1158,6 +1158,20 @@ th {
   font-weight: 900;
 }
 
+tfoot td {
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+  background: #f8fafc;
+  color: var(--ink);
+  font-weight: 900;
+  box-shadow: 0 -1px 0 #d7dee4;
+}
+
+.summary-row td {
+  padding: 12px 10px;
+}
+
 tbody tr:hover td {
   background: rgba(79, 70, 229, 0.035);
 }
