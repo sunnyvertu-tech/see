@@ -291,6 +291,100 @@ select:focus {
   background: #254c32;
 }
 
+.login-submit-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 50px;
+  margin-top: 4px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.44);
+  border-radius: 10px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.2), transparent 42%),
+    linear-gradient(135deg, #246043 0%, #3f8f56 44%, #9fce72 100%);
+  color: #fff;
+  box-shadow:
+    0 14px 34px rgba(32, 105, 65, 0.3),
+    0 0 0 1px rgba(117, 180, 109, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  font-size: 16px;
+  font-weight: 900;
+  letter-spacing: 0;
+  text-shadow: 0 1px 2px rgba(11, 39, 25, 0.32);
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    filter 0.18s ease;
+}
+
+.login-submit-button::before {
+  content: "";
+  position: absolute;
+  top: -35%;
+  bottom: -35%;
+  left: -45%;
+  width: 42%;
+  transform: rotate(18deg);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.58), transparent);
+  opacity: 0.72;
+}
+
+.login-submit-button::after {
+  content: "";
+  position: absolute;
+  inset: auto 18px 7px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.82), transparent);
+  opacity: 0.68;
+}
+
+.login-submit-button span {
+  position: relative;
+  z-index: 1;
+}
+
+.login-submit-button:hover {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.23), transparent 42%),
+    linear-gradient(135deg, #285fdf 0%, #5b5ff0 48%, #30c48d 100%);
+  box-shadow:
+    0 18px 46px rgba(79, 70, 229, 0.3),
+    0 0 0 4px rgba(79, 70, 229, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.34);
+  filter: saturate(1.08);
+  transform: translateY(-1px);
+}
+
+.login-submit-button:active {
+  transform: translateY(0) scale(0.99);
+}
+
+.login-submit-button:focus-visible {
+  outline: 3px solid rgba(79, 70, 229, 0.22);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .login-submit-button::before {
+    animation: loginButtonShine 2.8s ease-in-out infinite;
+  }
+}
+
+@keyframes loginButtonShine {
+  0%,
+  35% {
+    left: -45%;
+  }
+
+  70%,
+  100% {
+    left: 110%;
+  }
+}
+
 .ghost-button {
   padding: 0 16px;
   color: var(--green-deep);
