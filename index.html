@@ -10,75 +10,69 @@
     <section id="loginScreen" class="login-screen">
       <div class="login-aurora"></div>
       <div class="login-overlay"></div>
-      <div class="login-card">
-        <div class="login-side">
-          <div class="login-brand">
-            <div class="login-brand-mark" aria-hidden="true">销</div>
-            <div>
-              <strong>销售库存系统</strong>
-              <p>库存、销售、业绩与用户权限的一体化管理中台。</p>
+      <div class="login-glow-wrap">
+        <div class="login-card">
+          <div class="login-side">
+            <div class="login-brand">
+              <span class="login-brand-badge">管理端</span>
+              <h1>AINativeSales</h1>
+              <p>AI Native 销售管理中台，通过 Agent 编排看板、任务、专项、会议和报告。</p>
             </div>
+
+            <div class="login-stats" aria-label="系统能力">
+              <div class="login-stat-item">
+                <div>
+                  <strong>3</strong>
+                  <span>个渠道</span>
+                </div>
+                <p>微信 · WhatsApp · 电销</p>
+              </div>
+              <div class="login-stat-item">
+                <div>
+                  <strong>AI</strong>
+                  <span>质检</span>
+                </div>
+                <p>聊天合规自动审核</p>
+              </div>
+              <div class="login-stat-item">
+                <div>
+                  <strong>7×24</strong>
+                  <span>监控</span>
+                </div>
+                <p>非工作时段消息预警</p>
+              </div>
+            </div>
+
+            <p class="login-footer">Vertu · AINativeSales Team</p>
           </div>
 
-          <div class="login-visual" aria-hidden="true">
-            <div class="login-visual-head">
-              <span>实时经营概览</span>
-              <strong>LIVE</strong>
+          <div class="login-form-panel">
+            <div class="login-mobile-brand">
+              <span>管理端</span>
+              <strong>AINativeSales</strong>
             </div>
-            <div class="login-visual-grid">
-              <i></i>
-              <i></i>
-              <i></i>
-              <i></i>
-            </div>
-            <div class="login-visual-bars">
-              <span></span>
-              <span></span>
-              <span></span>
-            </div>
-          </div>
 
-          <div class="login-stats" aria-label="系统能力">
-            <div class="login-stat-item">
-              <span>库存金额</span>
-              <strong>实时</strong>
+            <div class="login-form-head">
+              <strong>登录</strong>
+              <p>使用您的账号密码继续</p>
             </div>
-            <div class="login-stat-item">
-              <span>销售业绩</span>
-              <strong>自动</strong>
-            </div>
-          </div>
-        </div>
 
-        <div class="login-form-panel">
-          <div class="login-mobile-brand">
-            <strong>销售库存系统</strong>
+            <form id="loginForm">
+              <label>
+                <span>账号</span>
+                <input name="username" placeholder="请输入账号" autocomplete="username" required />
+              </label>
+              <label>
+                <span>密码</span>
+                <input name="password" type="password" placeholder="请输入密码" autocomplete="current-password" required />
+              </label>
+              <input name="remember" type="checkbox" checked hidden />
+              <p id="loginError" class="login-error"></p>
+              <button class="primary-button login-submit-button" type="submit">
+                <span>登录</span>
+              </button>
+            </form>
           </div>
-
-          <div class="login-form-head">
-            <span>Welcome Back</span>
-            <strong>登录</strong>
-            <p>使用您的账号密码继续</p>
-          </div>
-
-          <form id="loginForm">
-            <label>
-              <span>账号</span>
-              <input name="username" placeholder="请输入账号" autocomplete="username" required />
-            </label>
-            <label>
-              <span>密码</span>
-              <input name="password" type="password" placeholder="请输入密码" autocomplete="current-password" required />
-            </label>
-            <label class="remember-line">
-              <input name="remember" type="checkbox" />
-              <span>记住密码</span>
-            </label>
-            <p id="loginError" class="login-error"></p>
-            <button class="primary-button login-submit-button" type="submit">
-              <span>登录</span>
-            </button>
-          </form>
         </div>
       </div>
     </section>
