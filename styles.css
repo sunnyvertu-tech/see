@@ -1242,20 +1242,23 @@ dialog::backdrop {
   background: #fff;
 }
 
-.user-module-tabs a {
+.user-module-tabs button {
   display: inline-flex;
   align-items: center;
   min-height: 34px;
   padding: 0 14px;
+  border: 0;
   border-radius: 8px;
   color: var(--muted);
   background: #f8fafc;
+  cursor: pointer;
   font-size: 14px;
   font-weight: 800;
   text-decoration: none;
 }
 
-.user-module-tabs a:hover {
+.user-module-tabs button:hover,
+.user-module-tabs button.active {
   color: var(--accent);
   background: var(--accent-soft);
 }

@@ -272,9 +272,9 @@
           <button data-action="close-user-dialog" type="button" aria-label="关闭">×</button>
         </div>
         <nav class="user-module-tabs" aria-label="用户管理功能">
-          <a href="#userListSection">人员列表</a>
-          <a href="#addUserSection">新增用户</a>
-          <a href="#permissionManageSection">权限管理</a>
+          <button data-user-section="userListSection" type="button">人员列表</button>
+          <button data-user-section="addUserSection" type="button">新增用户</button>
+          <button data-user-section="permissionManageSection" type="button">权限管理</button>
         </nav>
         <section class="user-manager" id="userListSection">
           <div class="section-title">
@@ -329,7 +329,7 @@
         </section>
         <div class="dialog-actions">
           <button class="ghost-button" data-action="close-user-dialog" type="button">取消</button>
-          <button class="primary-button compact" type="submit">保存用户</button>
+          <button class="primary-button compact" id="userSubmitButton" type="submit">保存用户</button>
         </div>
       </form>
     </dialog>

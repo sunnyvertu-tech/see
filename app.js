@@ -156,6 +156,7 @@ const currentUserLabel = document.querySelector("#currentUserLabel");
 const logoutButton = document.querySelector("#logoutButton");
 const userDialog = document.querySelector("#userDialog");
 const userForm = document.querySelector("#userForm");
+const userSubmitButton = document.querySelector("#userSubmitButton");
 const userList = document.querySelector("#userList");
 const userCount = document.querySelector("#userCount");
 const newUserPermissions = document.querySelector("#newUserPermissions");
@@ -182,6 +183,7 @@ const salesGoals = {
   week: 560000,
   month: 3500000
 };
+let userDialogSection = "userListSection";
 
 function save() {
   localStorage.setItem("sales-demo-items", JSON.stringify(items));
@@ -869,6 +871,34 @@ function fillPermissionForm() {
   renderPermissionCheckboxes(employeePermissions, "employee", normalizePermissionSet(permissions.employee, "employee"));
 }
 
+function setControlGroupDisabled(container, disabled) {
+  container.querySelectorAll("input, select, textarea, button").forEach((control) => {
+    control.disabled = disabled;
+  });
+}
+
+function setUserDialogSection(sectionId) {
+  userDialogSection = sectionId;
+  const sections = ["userListSection", "addUserSection", "permissionManageSection"];
+  sections.forEach((id) => {
+    const section = document.querySelector(`#${id}`);
+    const active = id === sectionId;
+    section?.classList.toggle("hidden", !active);
+    if (section) setControlGroupDisabled(section, !active);
+  });
+  document.querySelectorAll("[data-user-section]").forEach((button) => {
+    button.classList.toggle("active", button.dataset.userSection === sectionId);
+  });
+
+  const labels = {
+    userListSection: "仅查看",
+    addUserSection: "保存用户",
+    permissionManageSection: "保存权限"
+  };
+  userSubmitButton.textContent = labels[sectionId] || "保存";
+  userSubmitButton.hidden = sectionId === "userListSection";
+}
+
 loginForm.addEventListener("submit", (event) => {
   event.preventDefault();
   const username = loginForm.elements.username.value.trim();
@@ -898,13 +928,8 @@ function openUserManager(sectionId = "userListSection") {
   userForm.reset();
   fillPermissionForm();
   renderUsers();
+  setUserDialogSection(sectionId);
   userDialog.showModal();
-  userSectionTabs.forEach((button) => {
-    button.classList.toggle("active", button.dataset.userSection === sectionId);
-  });
-  requestAnimationFrame(() => {
-    document.querySelector(`#${sectionId}`)?.scrollIntoView({ block: "start" });
-  });
 }
 
 userSectionTabs.forEach((button) => {
@@ -913,8 +938,27 @@ userSectionTabs.forEach((button) => {
   });
 });
 
+userForm.querySelectorAll(".user-module-tabs [data-user-section]").forEach((button) => {
+  button.addEventListener("click", () => {
+    setUserDialogSection(button.dataset.userSection);
+  });
+});
+
 userForm.addEventListener("submit", (event) => {
   event.preventDefault();
+  if (userDialogSection === "permissionManageSection") {
+    permissions = {
+      super_admin: { ...allFeaturePermissions },
+      manager: readPermissionCheckboxes("manager"),
+      employee: readPermissionCheckboxes("employee")
+    };
+    savePermissions();
+    renderTable();
+    return;
+  }
+
+  if (userDialogSection !== "addUserSection") return;
+
   const username = cleanText(userForm.elements.username.value, 40);
   if (users.some((user) => user.username === username)) {
     userForm.elements.username.setCustomValidity("账号已存在");
@@ -929,16 +973,11 @@ userForm.addEventListener("submit", (event) => {
     permissions: readPermissionCheckboxes("new")
   }));
   saveUsers();
-  permissions = {
-    super_admin: { ...allFeaturePermissions },
-    manager: readPermissionCheckboxes("manager"),
-    employee: readPermissionCheckboxes("employee")
-  };
-  savePermissions();
   userForm.reset();
   fillPermissionForm();
   renderUsers();
   renderTable();
+  setUserDialogSection("userListSection");
 });
 
 userForm.addEventListener("click", (event) => {
