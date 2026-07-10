@@ -127,7 +127,7 @@ select {
   transition: transform 0.16s ease;
 }
 
-.sales-nav-section.expanded .side-chevron {
+.side-section.expanded .side-chevron {
   transform: rotate(90deg);
 }
 

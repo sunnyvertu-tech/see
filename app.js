@@ -148,8 +148,11 @@ const companyPerformanceButton = document.querySelector("#companyPerformanceButt
 const salesNavSection = document.querySelector("#salesNavSection");
 const salesMenuToggle = document.querySelector("#salesMenuToggle");
 const salesMenuPanel = document.querySelector("#salesMenuPanel");
+const userNavSection = document.querySelector("#userNavSection");
+const userMenuToggle = document.querySelector("#userMenuToggle");
+const userMenuPanel = document.querySelector("#userMenuPanel");
+const userSectionTabs = document.querySelectorAll(".user-section-tab");
 const currentUserLabel = document.querySelector("#currentUserLabel");
-const addUserButton = document.querySelector("#addUserButton");
 const logoutButton = document.querySelector("#logoutButton");
 const userDialog = document.querySelector("#userDialog");
 const userForm = document.querySelector("#userForm");
@@ -653,7 +656,7 @@ function applySale(item, salePrice, seller) {
 
 function renderPermissionState() {
   currentUserLabel.textContent = currentUser ? `${currentUser.username} / ${roleName(currentRole)}` : "未登录";
-  addUserButton.hidden = !canUse("userManage");
+  userNavSection.hidden = !canUse("userManage");
   document.querySelector("#resetButton").hidden = !canUse("refreshPage");
   document.querySelector("#importButton").hidden = !canUse("importData");
   document.querySelector("#exportButton").hidden = !canUse("exportData");
@@ -854,6 +857,12 @@ salesMenuToggle.addEventListener("click", () => {
   salesMenuPanel.classList.toggle("collapsed", !expanded);
 });
 
+userMenuToggle.addEventListener("click", () => {
+  const expanded = userNavSection.classList.toggle("expanded");
+  userMenuToggle.setAttribute("aria-expanded", String(expanded));
+  userMenuPanel.classList.toggle("collapsed", !expanded);
+});
+
 function fillPermissionForm() {
   renderPermissionCheckboxes(newUserPermissions, "new", normalizePermissionSet(defaultRolePermissions.employee, "employee"));
   renderPermissionCheckboxes(managerPermissions, "manager", normalizePermissionSet(permissions.manager, "manager"));
@@ -884,12 +893,24 @@ logoutButton.addEventListener("click", () => {
   showLogin();
 });
 
-addUserButton.addEventListener("click", () => {
+function openUserManager(sectionId = "userListSection") {
   if (!canUse("userManage")) return;
   userForm.reset();
   fillPermissionForm();
   renderUsers();
   userDialog.showModal();
+  userSectionTabs.forEach((button) => {
+    button.classList.toggle("active", button.dataset.userSection === sectionId);
+  });
+  requestAnimationFrame(() => {
+    document.querySelector(`#${sectionId}`)?.scrollIntoView({ block: "start" });
+  });
+}
+
+userSectionTabs.forEach((button) => {
+  button.addEventListener("click", () => {
+    openUserManager(button.dataset.userSection);
+  });
 });
 
 userForm.addEventListener("submit", (event) => {

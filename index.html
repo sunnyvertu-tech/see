@@ -99,11 +99,17 @@
               <button class="view-tab" data-view="stock" type="button">库存</button>
             </div>
           </div>
-          <div class="side-section">
-            <button id="addUserButton" class="side-section-title side-action" type="button">
+          <div class="side-section user-nav-section" id="userNavSection">
+            <button class="side-section-title side-action" id="userMenuToggle" type="button" aria-expanded="false">
               <span class="side-icon">权</span>
               <span>用户管理</span>
+              <span class="side-chevron">›</span>
             </button>
+            <div class="view-tabs collapsed" id="userMenuPanel" aria-label="用户管理切换">
+              <button class="view-tab user-section-tab" data-user-section="userListSection" type="button">人员列表</button>
+              <button class="view-tab user-section-tab" data-user-section="addUserSection" type="button">新增用户</button>
+              <button class="view-tab user-section-tab" data-user-section="permissionManageSection" type="button">权限管理</button>
+            </div>
           </div>
         </nav>
         <button id="logoutButton" class="sidebar-logout" type="button">退出登录</button>
