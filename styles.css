@@ -1231,6 +1231,35 @@ dialog::backdrop {
   font-size: 20px;
 }
 
+.user-module-tabs {
+  position: sticky;
+  top: 77px;
+  z-index: 2;
+  display: flex;
+  gap: 8px;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--line);
+  background: #fff;
+}
+
+.user-module-tabs a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 14px;
+  border-radius: 8px;
+  color: var(--muted);
+  background: #f8fafc;
+  font-size: 14px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.user-module-tabs a:hover {
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
 #userForm .dialog-actions {
   position: sticky;
   bottom: 0;
@@ -1258,7 +1287,14 @@ dialog::backdrop {
   gap: 14px;
 }
 
-.add-user-panel > label {
+.user-form-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.add-user-panel label,
+.user-form-grid label {
   margin-bottom: 0;
 }
 
@@ -1330,8 +1366,9 @@ dialog::backdrop {
   gap: 10px;
 }
 
-.default-permissions {
-  margin-top: 16px;
+.permission-manage-panel {
+  display: grid;
+  gap: 14px;
 }
 
 .compact-title {
@@ -1371,8 +1408,10 @@ dialog::backdrop {
 .role-permission-block {
   display: grid;
   gap: 8px;
-  padding-top: 12px;
-  border-top: 1px solid var(--line);
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
 }
 
 .role-permission-block > strong {
@@ -1654,9 +1693,24 @@ dialog::backdrop {
     padding-right: 16px;
   }
 
+  .user-module-tabs {
+    top: 69px;
+    overflow-x: auto;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .user-module-tabs a {
+    flex: 0 0 auto;
+  }
+
   #userForm .user-manager {
     margin-left: 16px;
     margin-right: 16px;
+  }
+
+  .user-form-grid {
+    grid-template-columns: 1fr;
   }
 
   .user-row {

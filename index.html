@@ -265,42 +265,52 @@
           <strong>用户管理</strong>
           <button data-action="close-user-dialog" type="button" aria-label="关闭">×</button>
         </div>
-        <section class="user-manager">
+        <nav class="user-module-tabs" aria-label="用户管理功能">
+          <a href="#userListSection">人员列表</a>
+          <a href="#addUserSection">新增用户</a>
+          <a href="#permissionManageSection">权限管理</a>
+        </nav>
+        <section class="user-manager" id="userListSection">
           <div class="section-title">
             <span>人员列表</span>
             <small id="userCount">0 人</small>
           </div>
           <div class="user-list" id="userList"></div>
         </section>
-        <section class="user-manager add-user-panel">
+        <section class="user-manager add-user-panel" id="addUserSection">
           <div class="section-title">
             <span>新增用户</span>
+            <small>账号、角色和个人权限</small>
           </div>
-        <label>
-          <span>账号</span>
-          <input name="username" placeholder="请输入登录账号" required />
-        </label>
-        <label>
-          <span>密码</span>
-          <input name="password" type="password" placeholder="请输入登录密码" required />
-        </label>
-        <label>
-          <span>角色</span>
-          <select name="role" required>
-            <option value="manager">主管</option>
-            <option value="employee">员工</option>
-            <option value="super_admin">超级管理员</option>
-          </select>
-        </label>
-        <div class="permission-list">
-          <div class="section-title compact-title">
-            <span>新用户权限</span>
+          <div class="user-form-grid">
+            <label>
+              <span>账号</span>
+              <input name="username" placeholder="请输入登录账号" required />
+            </label>
+            <label>
+              <span>密码</span>
+              <input name="password" type="password" placeholder="请输入登录密码" required />
+            </label>
+            <label>
+              <span>角色</span>
+              <select name="role" required>
+                <option value="manager">主管</option>
+                <option value="employee">员工</option>
+                <option value="super_admin">超级管理员</option>
+              </select>
+            </label>
           </div>
-          <div id="newUserPermissions" class="permission-grid"></div>
-        </div>
-        <div class="permission-list default-permissions">
+          <div class="permission-list">
+            <div class="section-title compact-title">
+              <span>新用户权限</span>
+            </div>
+            <div id="newUserPermissions" class="permission-grid"></div>
+          </div>
+        </section>
+        <section class="user-manager permission-manage-panel" id="permissionManageSection">
           <div class="section-title compact-title">
-            <span>默认角色权限</span>
+            <span>权限管理</span>
+            <small>设置主管和员工的默认功能权限</small>
           </div>
           <div class="role-permission-block">
             <strong>主管</strong>
@@ -310,7 +320,6 @@
             <strong>员工</strong>
             <div id="employeePermissions" class="permission-grid"></div>
           </div>
-        </div>
         </section>
         <div class="dialog-actions">
           <button class="ghost-button" data-action="close-user-dialog" type="button">取消</button>
