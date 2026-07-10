@@ -127,13 +127,9 @@ const defaultUsers = [
   { username: "admin", password: "admin123", role: "super_admin", permissions: { ...allFeaturePermissions } },
   { username: "manager", password: "123456", role: "manager" },
   { username: "employee", password: "123456", role: "employee" },
-  { username: "母彬", password: "123456", role: "super_admin", permissions: { ...allFeaturePermissions } },
-  { username: "叶美", password: "123456", role: "employee", permissions: { ...defaultRolePermissions.employee } },
-  { username: "陈梦雪", password: "123456", role: "employee", permissions: { ...defaultRolePermissions.employee } },
-  { username: "肖丽", password: "123456", role: "employee", permissions: { ...defaultRolePermissions.employee } },
-  { username: "贾思懿", password: "123456", role: "employee", permissions: { ...defaultRolePermissions.employee } },
-  { username: "soso", password: "123456", role: "employee", permissions: { ...defaultRolePermissions.employee } }
+  { username: "母彬", password: "123456", role: "super_admin", permissions: { ...allFeaturePermissions } }
 ];
+const legacySalespersonUsers = new Set(["叶美", "陈梦雪", "肖丽", "贾思懿", "soso"]);
 let users = readStoredArray("sales-demo-users", []).map(normalizeUser).filter((user) => user.username && user.password);
 let currentUser = null;
 let currentRole = "";
@@ -182,6 +178,7 @@ const addStockButton = document.querySelector("#addStockButton");
 const stockSubmitButton = document.querySelector("#stockSubmitButton");
 const saleDialog = document.querySelector("#saleDialog");
 const saleForm = document.querySelector("#saleForm");
+const sellerOptions = document.querySelector("#sellerOptions");
 const importInput = document.querySelector("#importInput");
 const metricsSection = document.querySelector(".metrics");
 const tableZone = document.querySelector(".table-zone");
@@ -240,6 +237,13 @@ function normalizePermissions() {
     permissions: user.username === "母彬" ? { ...allFeaturePermissions } : user.permissions ? normalizePermissionSet(user.permissions, user.role) : undefined
   }));
   savePermissions();
+  saveUsers();
+}
+
+function removeLegacySalespersonUsers() {
+  const nextUsers = users.filter((user) => !legacySalespersonUsers.has(user.username));
+  if (nextUsers.length === users.length) return;
+  users = nextUsers;
   saveUsers();
 }
 
@@ -403,7 +407,7 @@ function canViewAllData() {
 
 function isOwnItem(item) {
   if (!currentUser) return false;
-  return item.owner === currentUser.username || item.soldBy === currentUser.username || item.seller === currentUser.username;
+  return item.owner === currentUser.username || item.soldBy === currentUser.username;
 }
 
 function roleName(role) {
@@ -526,6 +530,11 @@ function fillSelect(select, values, placeholder) {
     `<option value="">${escapeHtml(placeholder)}</option>`,
     ...values.map((value) => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`)
   ].join("");
+}
+
+function renderSellerOptions() {
+  const sellers = uniqueValues(items.filter((item) => item.sold), "seller");
+  sellerOptions.innerHTML = sellers.map((seller) => `<option value="${escapeHtml(seller)}"></option>`).join("");
 }
 
 function setFieldMode(fieldName, useSelect) {
@@ -657,7 +666,7 @@ function prepareStockDialog() {
   itemForm.querySelector(".sales-only-field").classList.toggle("hidden", !isSalesView);
   itemForm.elements.salePrice.required = isSalesView;
   itemForm.elements.seller.required = isSalesView;
-  itemForm.elements.seller.value = isSalesView ? currentUser?.username || "" : "";
+  itemForm.elements.seller.value = "";
   if (isSalesView) {
     refreshSalesPickers();
     itemForm.elements.price.readOnly = true;
@@ -680,6 +689,7 @@ function renderTable() {
   const list = filteredItems();
   renderPerformanceDashboard();
   renderMetrics(list);
+  renderSellerOptions();
   renderTableHead();
   tableBody.innerHTML = "";
   tableFoot.innerHTML = "";
@@ -729,7 +739,7 @@ function openSaleDialog(id) {
   if (!item) return;
   saleForm.elements.id.value = item.id;
   saleForm.elements.salePrice.value = item.salePrice || "";
-  saleForm.elements.seller.value = item.seller || currentUser?.username || "";
+  saleForm.elements.seller.value = item.seller || "";
   saleDialog.showModal();
 }
 
@@ -1229,6 +1239,7 @@ document.querySelector("#exportButton").addEventListener("click", () => {
   exportCsv();
 });
 
+removeLegacySalespersonUsers();
 normalizePermissions();
 mergeDefaultUsers();
 loadRememberedLogin();

@@ -422,7 +422,7 @@
           </label>
           <label>
             <span>销售员</span>
-            <input name="seller" placeholder="请输入销售员" />
+            <input name="seller" list="sellerOptions" placeholder="请输入销售员" />
           </label>
         </div>
         <div class="dialog-actions">
@@ -445,7 +445,7 @@
         </label>
         <label>
           <span>销售员</span>
-          <input name="seller" placeholder="请输入销售员" required />
+          <input name="seller" list="sellerOptions" placeholder="请输入销售员" required />
         </label>
         <div class="dialog-actions">
           <button class="ghost-button" data-action="close-sale-dialog" type="button">取消</button>
@@ -453,6 +453,7 @@
         </div>
       </form>
     </dialog>
+    <datalist id="sellerOptions"></datalist>
 
     <script src="./app.js"></script>
   </body>
