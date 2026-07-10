@@ -93,6 +93,7 @@ let items = readStoredArray("sales-demo-items", seedItems).map(normalizeItem);
 let sortKey = "date";
 let sortDir = "desc";
 let currentView = "";
+let currentUserPage = "";
 const featureModules = [
   { key: "stock", label: "库存" },
   { key: "sales", label: "销售" },
@@ -143,7 +144,7 @@ const loginScreen = document.querySelector("#loginScreen");
 const loginForm = document.querySelector("#loginForm");
 const loginError = document.querySelector("#loginError");
 const tableBody = document.querySelector("#tableBody");
-const viewButtons = document.querySelectorAll(".view-tab");
+const viewButtons = document.querySelectorAll("[data-view]");
 const companyPerformanceButton = document.querySelector("#companyPerformanceButton");
 const salesNavSection = document.querySelector("#salesNavSection");
 const salesMenuToggle = document.querySelector("#salesMenuToggle");
@@ -162,6 +163,17 @@ const userCount = document.querySelector("#userCount");
 const newUserPermissions = document.querySelector("#newUserPermissions");
 const managerPermissions = document.querySelector("#managerPermissions");
 const employeePermissions = document.querySelector("#employeePermissions");
+const userManagementPage = document.querySelector("#userManagementPage");
+const userPageTitle = document.querySelector("#userPageTitle");
+const userPageSubtitle = document.querySelector("#userPageSubtitle");
+const userPageSections = document.querySelectorAll(".user-page-section");
+const pageUserList = document.querySelector("#pageUserList");
+const pageUserCount = document.querySelector("#pageUserCount");
+const addUserPageForm = document.querySelector("#addUserPageForm");
+const permissionsPageForm = document.querySelector("#permissionsPageForm");
+const pageNewUserPermissions = document.querySelector("#pageNewUserPermissions");
+const pageManagerPermissions = document.querySelector("#pageManagerPermissions");
+const pageEmployeePermissions = document.querySelector("#pageEmployeePermissions");
 const itemForm = document.querySelector("#itemForm");
 const stockDialog = document.querySelector("#stockDialog");
 const addStockButton = document.querySelector("#addStockButton");
@@ -184,6 +196,20 @@ const salesGoals = {
   month: 3500000
 };
 let userDialogSection = "userListSection";
+const userPageMeta = {
+  userListPage: {
+    title: "人员列表",
+    subtitle: "查看系统登录人员、角色和已开启的功能权限。"
+  },
+  addUserPage: {
+    title: "新增用户",
+    subtitle: "录入新员工账号，并单独配置这个账号可使用的功能按钮。"
+  },
+  permissionManagePage: {
+    title: "权限管理",
+    subtitle: "设置主管和员工新增账号时默认拥有的功能权限。"
+  }
+};
 
 function save() {
   localStorage.setItem("sales-demo-items", JSON.stringify(items));
@@ -346,7 +372,7 @@ function renderRank(containerId, list) {
 function renderPerformanceDashboard() {
   const dashboard = document.querySelector("#performanceDashboard");
   const dashboardHeader = document.querySelector("#dashboardHeader");
-  const shouldShowDashboard = !currentView && canUse("sales");
+  const shouldShowDashboard = !currentView && !currentUserPage && canUse("sales");
   dashboard.classList.toggle("hidden", !shouldShowDashboard);
   dashboardHeader?.classList.toggle("hidden", !shouldShowDashboard);
   if (!shouldShowDashboard) return;
@@ -461,16 +487,15 @@ function renderPermissionCheckboxes(container, namePrefix, values = {}) {
   `).join("");
 }
 
-function readPermissionCheckboxes(namePrefix) {
+function readPermissionCheckboxes(namePrefix, form = userForm) {
   return Object.fromEntries(featureModules.map((feature) => [
     feature.key,
-    Boolean(userForm.elements[`${namePrefix}-${feature.key}`]?.checked)
+    Boolean(form.elements[`${namePrefix}-${feature.key}`]?.checked)
   ]));
 }
 
 function renderUsers() {
-  userCount.textContent = `${users.length} 人`;
-  userList.innerHTML = users.map((user) => {
+  const markup = users.map((user) => {
     const isCurrent = currentUser?.username === user.username;
     const isLastAdmin = user.role === "super_admin" && users.filter((entry) => entry.role === "super_admin").length === 1;
     const canDelete = !isCurrent && !isLastAdmin;
@@ -502,12 +527,17 @@ function renderUsers() {
       </article>
     `;
   }).join("");
+  userCount.textContent = `${users.length} 人`;
+  userList.innerHTML = markup;
+  pageUserCount.textContent = `${users.length} 人`;
+  pageUserList.innerHTML = markup;
 }
 
 function showApp(user) {
   currentUser = user;
   currentRole = user.role;
   currentView = "";
+  currentUserPage = "";
   loginScreen.classList.add("hidden");
   appShell.classList.remove("hidden");
   renderTable();
@@ -624,6 +654,7 @@ function refreshSalesPickers() {
 }
 
 function renderMetrics(list) {
+  renderUserPage();
   metricsSection.classList.toggle("hidden", !currentView);
   tableZone.classList.toggle("hidden", !currentView);
   document.querySelectorAll('[data-metric="stock"]').forEach((card) => {
@@ -659,6 +690,7 @@ function applySale(item, salePrice, seller) {
 function renderPermissionState() {
   currentUserLabel.textContent = currentUser ? `${currentUser.username} / ${roleName(currentRole)}` : "未登录";
   userNavSection.hidden = !canUse("userManage");
+  if (currentUserPage && !canUse("userManage")) currentUserPage = "";
   document.querySelector("#resetButton").hidden = !canUse("refreshPage");
   document.querySelector("#importButton").hidden = !canUse("importData");
   document.querySelector("#exportButton").hidden = !canUse("exportData");
@@ -672,7 +704,10 @@ function renderPermissionState() {
     button.hidden = !canView(view);
     button.classList.toggle("active", view === currentView);
   });
-  companyPerformanceButton.classList.toggle("active", !currentView);
+  companyPerformanceButton.classList.toggle("active", !currentView && !currentUserPage);
+  userSectionTabs.forEach((button) => {
+    button.classList.toggle("active", button.dataset.userPage === currentUserPage);
+  });
 
   addStockButton.hidden = !currentView || (currentView === "sales" ? !canUse("addSales") : !canUse("addStock"));
   addStockButton.textContent = currentView === "sales" ? "新增销售" : "新增库存";
@@ -844,12 +879,14 @@ viewButtons.forEach((button) => {
   button.addEventListener("click", () => {
     if (!canView(button.dataset.view)) return;
     currentView = button.dataset.view;
+    currentUserPage = "";
     renderTable();
   });
 });
 
 companyPerformanceButton.addEventListener("click", () => {
   currentView = "";
+  currentUserPage = "";
   renderTable();
 });
 
@@ -869,6 +906,38 @@ function fillPermissionForm() {
   renderPermissionCheckboxes(newUserPermissions, "new", normalizePermissionSet(defaultRolePermissions.employee, "employee"));
   renderPermissionCheckboxes(managerPermissions, "manager", normalizePermissionSet(permissions.manager, "manager"));
   renderPermissionCheckboxes(employeePermissions, "employee", normalizePermissionSet(permissions.employee, "employee"));
+}
+
+function fillPagePermissionForms() {
+  renderPermissionCheckboxes(pageNewUserPermissions, "pageNew", normalizePermissionSet(defaultRolePermissions.employee, "employee"));
+  renderPermissionCheckboxes(pageManagerPermissions, "pageManager", normalizePermissionSet(permissions.manager, "manager"));
+  renderPermissionCheckboxes(pageEmployeePermissions, "pageEmployee", normalizePermissionSet(permissions.employee, "employee"));
+}
+
+function renderUserPage() {
+  const isUserPage = Boolean(currentUserPage);
+  userManagementPage.classList.toggle("hidden", !isUserPage);
+  if (!isUserPage) return;
+
+  const pageId = userPageMeta[currentUserPage] ? currentUserPage : "userListPage";
+  currentUserPage = pageId;
+  userPageTitle.textContent = userPageMeta[pageId].title;
+  userPageSubtitle.textContent = userPageMeta[pageId].subtitle;
+  userPageSections.forEach((section) => {
+    section.classList.toggle("hidden", section.id !== pageId);
+  });
+}
+
+function showUserPage(pageId = "userListPage") {
+  if (!canUse("userManage")) return;
+  currentView = "";
+  currentUserPage = userPageMeta[pageId] ? pageId : "userListPage";
+  userNavSection.classList.add("expanded");
+  userMenuToggle.setAttribute("aria-expanded", "true");
+  userMenuPanel.classList.remove("collapsed");
+  fillPagePermissionForms();
+  renderUsers();
+  renderTable();
 }
 
 function setControlGroupDisabled(container, disabled) {
@@ -934,7 +1003,7 @@ function openUserManager(sectionId = "userListSection") {
 
 userSectionTabs.forEach((button) => {
   button.addEventListener("click", () => {
-    openUserManager(button.dataset.userSection);
+    showUserPage(button.dataset.userPage);
   });
 });
 
@@ -980,13 +1049,7 @@ userForm.addEventListener("submit", (event) => {
   setUserDialogSection("userListSection");
 });
 
-userForm.addEventListener("click", (event) => {
-  const closeButton = event.target.closest('[data-action="close-user-dialog"]');
-  if (closeButton) {
-    userDialog.close();
-    return;
-  }
-
+function handleUserListAction(event) {
   const deleteButton = event.target.closest('[data-action="delete-user"]');
   const resetButton = event.target.closest('[data-action="reset-user-password"]');
   if (resetButton) {
@@ -1014,6 +1077,50 @@ userForm.addEventListener("click", (event) => {
     localStorage.removeItem("sales-demo-remember");
   }
   renderUsers();
+  renderTable();
+}
+
+userForm.addEventListener("click", (event) => {
+  const closeButton = event.target.closest('[data-action="close-user-dialog"]');
+  if (closeButton) {
+    userDialog.close();
+    return;
+  }
+  handleUserListAction(event);
+});
+
+pageUserList.addEventListener("click", handleUserListAction);
+
+addUserPageForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const username = cleanText(addUserPageForm.elements.pageUsername.value, 40);
+  if (users.some((user) => user.username === username)) {
+    addUserPageForm.elements.pageUsername.setCustomValidity("账号已存在");
+    addUserPageForm.reportValidity();
+    return;
+  }
+  addUserPageForm.elements.pageUsername.setCustomValidity("");
+  users.push(normalizeUser({
+    username,
+    password: addUserPageForm.elements.pagePassword.value,
+    role: addUserPageForm.elements.pageRole.value,
+    permissions: readPermissionCheckboxes("pageNew", addUserPageForm)
+  }));
+  saveUsers();
+  addUserPageForm.reset();
+  fillPagePermissionForms();
+  renderUsers();
+  showUserPage("userListPage");
+});
+
+permissionsPageForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  permissions = {
+    super_admin: { ...allFeaturePermissions },
+    manager: readPermissionCheckboxes("pageManager", permissionsPageForm),
+    employee: readPermissionCheckboxes("pageEmployee", permissionsPageForm)
+  };
+  savePermissions();
   renderTable();
 });
 

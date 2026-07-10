@@ -1263,6 +1263,36 @@ dialog::backdrop {
   background: var(--accent-soft);
 }
 
+.user-page {
+  display: grid;
+  gap: 16px;
+}
+
+.user-page.hidden,
+.user-page-section.hidden {
+  display: none;
+}
+
+.user-page-head {
+  margin-bottom: 0;
+}
+
+.user-page .user-manager {
+  margin: 0;
+  background: #fff;
+  box-shadow: var(--shadow);
+}
+
+.user-page .permission-manage-panel,
+.user-page .add-user-panel {
+  gap: 16px;
+}
+
+.inline-actions {
+  justify-content: flex-end;
+  margin-top: 2px;
+}
+
 #userForm .dialog-actions {
   position: sticky;
   bottom: 0;
