@@ -1275,7 +1275,7 @@ dialog::backdrop {
 }
 
 #pageUserList {
-  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  grid-template-columns: 1fr;
   max-height: none;
   overflow: visible;
 }
@@ -1310,16 +1310,14 @@ dialog::backdrop {
 }
 
 #pageUserList .user-row {
-  align-items: stretch;
-  min-height: 92px;
+  align-items: center;
+  min-height: 72px;
 }
 
 #pageUserList .user-row span {
-  display: -webkit-box;
   overflow: hidden;
-  white-space: normal;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .user-row button:disabled {
