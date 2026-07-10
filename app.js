@@ -745,6 +745,7 @@ function renderTable() {
     const row = document.createElement("tr");
     row.innerHTML = `
       <td>${escapeHtml(item.date.replaceAll("-", "/"))}</td>
+      <td>${escapeHtml(item.seller || "")}</td>
       <td>${escapeHtml(item.model)}</td>
       <td>${escapeHtml(item.style)}</td>
       <td>${escapeHtml(item.vsn)}</td>
@@ -756,7 +757,6 @@ function renderTable() {
       </td>
       <td>${item.sold ? formatNumber(item.salePrice) : ""}</td>
       <td>${item.sold ? formatNumber(profitOf(item)) : ""}</td>
-      <td>${escapeHtml(item.seller || "")}</td>
       <td>
         ${canUse("sellItem") ? `<button class="link-button" data-action="sell" data-id="${item.id}">${item.sold ? "修改" : "售卖"}</button>` : ""}
         ${canUse("deleteItem") ? `<button class="link-button danger" data-action="remove" data-id="${item.id}">删除</button>` : ""}
@@ -770,11 +770,11 @@ function renderTable() {
     const profitTotal = list.reduce((sum, item) => sum + profitOf(item), 0);
     tableFoot.innerHTML = `
       <tr class="summary-row">
-        <td colspan="7">总计</td>
+        <td colspan="8">总计</td>
         <td>${list.length} 件</td>
         <td>${formatNumber(salesTotal)}</td>
         <td>${formatNumber(profitTotal)}</td>
-        <td colspan="2"></td>
+        <td></td>
       </tr>
     `;
   }
