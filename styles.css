@@ -757,33 +757,6 @@ select:focus {
   font-size: 13px;
 }
 
-.dashboard-tabs {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  background: #fff;
-  box-shadow: var(--shadow);
-}
-
-.dashboard-tabs span {
-  display: inline-flex;
-  align-items: center;
-  min-height: 30px;
-  padding: 0 12px;
-  border-radius: 7px;
-  color: var(--muted);
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.dashboard-tabs .active {
-  color: var(--accent);
-  background: var(--accent-soft);
-}
-
 .eyebrow {
   color: var(--green-deep);
   font-size: 12px;
@@ -846,7 +819,7 @@ select:focus {
 
 .performance-dashboard {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
   gap: 16px;
   margin-bottom: 16px;
 }
@@ -856,88 +829,42 @@ select:focus {
 }
 
 .performance-panel {
-  padding: 16px;
-  border-radius: 16px;
-}
-
-.day-panel {
-  background: #edf4ff;
-}
-
-.period-panel {
-  background: #e9fbf2;
-}
-
-.performance-panel h2,
-.rank-card h3,
-.period-card h3 {
-  margin: 0;
-  color: var(--ink);
-  font-size: 14px;
-  font-weight: 800;
-}
-
-.performance-panel h2 {
-  margin-bottom: 10px;
-}
-
-.day-summary-grid,
-.rank-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-}
-
-.performance-card,
-.rank-card,
-.period-card {
-  border: 1px solid rgba(226, 232, 240, 0.9);
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.96);
+  gap: 16px;
+  min-height: 220px;
+  padding: 18px;
+  border-radius: 16px;
+  border: 1px solid rgba(226, 232, 240, 0.95);
   box-shadow: var(--shadow);
 }
 
-.performance-card {
-  padding: 14px;
+.month-panel {
+  background: #e9fbf2;
 }
 
-.card-head {
+.week-panel {
+  background: #edf4ff;
+}
+
+.panel-head {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  gap: 10px;
+  gap: 12px;
+  align-items: flex-start;
 }
 
-.card-head span,
-.period-card > div > span {
-  color: #7c3aed;
-  font-size: 13px;
-  font-weight: 900;
-}
-
-.card-head strong {
-  color: #b95062;
-  font-size: 13px;
-}
-
-.performance-card p,
-.period-card p {
-  margin: 8px 0;
-}
-
-.performance-card p strong,
-.period-card p strong {
-  margin-right: 4px;
+.performance-panel h2 {
+  margin: 0;
   color: var(--ink);
-  font-size: 24px;
-  letter-spacing: 0;
+  font-size: 16px;
+  font-weight: 800;
 }
 
-.performance-card p span,
-.period-card p span,
-.performance-card small,
-.period-card small {
+.panel-head small {
+  display: block;
+  margin-top: 6px;
   color: var(--muted);
+  font-size: 13px;
 }
 
 .badge-line {
@@ -946,6 +873,12 @@ select:focus {
   gap: 6px;
   min-height: 22px;
   margin-top: 8px;
+}
+
+.panel-head .badge-line {
+  justify-content: flex-end;
+  min-width: 90px;
+  margin-top: 0;
 }
 
 .metric-badge {
@@ -965,67 +898,41 @@ select:focus {
   background: #fee2e2;
 }
 
-.rank-card {
-  min-height: 148px;
-  padding: 14px;
-  margin-top: 12px;
-}
-
-.bar-list {
+.performance-kpis {
   display: grid;
-  gap: 10px;
-  margin-top: 14px;
-}
-
-.bar-row {
-  display: grid;
-  grid-template-columns: 92px minmax(0, 1fr) 56px;
-  align-items: center;
-  gap: 8px;
-  color: var(--muted);
-  font-size: 12px;
-}
-
-.bar-track {
-  height: 13px;
-  overflow: hidden;
-  border-radius: 0;
-  background: #eef2f1;
-}
-
-.bar-track i {
-  display: block;
-  width: var(--bar-width);
-  height: 100%;
-  background: var(--bar-color, var(--blue));
-}
-
-.bar-row strong {
-  color: #475569;
-  font-weight: 800;
-  text-align: right;
-}
-
-.bar-empty {
-  color: var(--muted);
-  font-size: 13px;
-}
-
-.period-panel {
-  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px;
 }
 
-.period-card {
-  display: grid;
-  grid-template-columns: minmax(190px, 0.9fr) minmax(260px, 1fr);
-  gap: 20px;
-  padding: 14px;
+.week-panel .performance-kpis {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-.period-card > div > small {
-  display: block;
-  margin-top: 4px;
+.performance-kpi {
+  display: grid;
+  gap: 8px;
+  align-content: center;
+  min-height: 112px;
+  padding: 16px;
+  border: 1px solid rgba(226, 232, 240, 0.95);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.94);
+}
+
+.performance-kpi span {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.performance-kpi strong {
+  color: var(--ink);
+  font-size: 28px;
+  letter-spacing: 0;
+}
+
+.performance-kpi.primary strong {
+  font-size: 34px;
 }
 
 .progress-group {
@@ -1568,10 +1475,6 @@ dialog::backdrop {
     flex-direction: column;
   }
 
-  .dashboard-tabs {
-    align-self: flex-start;
-  }
-
   .metrics {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 10px;
@@ -1581,7 +1484,8 @@ dialog::backdrop {
     grid-template-columns: 1fr;
   }
 
-  .period-card {
+  .performance-kpis,
+  .week-panel .performance-kpis {
     grid-template-columns: 1fr;
   }
 
@@ -1613,15 +1517,6 @@ dialog::backdrop {
 
   .login-form-head strong {
     font-size: 28px;
-  }
-
-  .dashboard-tabs {
-    width: 100%;
-    overflow-x: auto;
-  }
-
-  .dashboard-tabs span {
-    flex: 0 0 auto;
   }
 
   .workspace {
@@ -1664,24 +1559,22 @@ dialog::backdrop {
     border-radius: 12px;
   }
 
-  .day-summary-grid,
-  .rank-grid {
-    grid-template-columns: 1fr;
+  .panel-head {
+    flex-direction: column;
   }
 
-  .performance-card,
-  .rank-card,
-  .period-card {
+  .panel-head .badge-line {
+    justify-content: flex-start;
+  }
+
+  .performance-kpi {
+    min-height: 96px;
     border-radius: 10px;
   }
 
-  .performance-card p strong,
-  .period-card p strong {
-    font-size: 20px;
-  }
-
-  .bar-row {
-    grid-template-columns: 70px minmax(0, 1fr) 48px;
+  .performance-kpi strong,
+  .performance-kpi.primary strong {
+    font-size: 24px;
   }
 
   .metrics article {

@@ -191,9 +191,7 @@ const money = new Intl.NumberFormat("zh-CN", {
   currency: "CNY",
   maximumFractionDigits: 1
 });
-const chartColors = ["#8b5cf6", "#06b6d4", "#10b981", "#f59e0b", "#f97316"];
 const salesGoals = {
-  day: 100000,
   week: 560000,
   month: 3500000
 };
@@ -339,38 +337,6 @@ function renderBadges(containerId, badges) {
   `).join("");
 }
 
-function rankBySeller(list) {
-  const ranks = new Map();
-  list.forEach((item) => {
-    const name = item.seller || item.soldBy || "未填写";
-    ranks.set(name, (ranks.get(name) || 0) + Number(item.salePrice || 0));
-  });
-  return [...ranks.entries()]
-    .map(([name, value]) => ({ name, value }))
-    .sort((a, b) => b.value - a.value)
-    .slice(0, 5);
-}
-
-function renderRank(containerId, list) {
-  const container = document.querySelector(containerId);
-  const ranks = rankBySeller(list);
-  const max = Math.max(...ranks.map((rank) => rank.value), 0);
-  if (!ranks.length) {
-    container.innerHTML = '<span class="bar-empty">暂无销售数据</span>';
-    return;
-  }
-  container.innerHTML = ranks.map((rank, index) => {
-    const width = max ? Math.max(8, Math.round((rank.value / max) * 100)) : 0;
-    return `
-      <div class="bar-row">
-        <span>${escapeHtml(rank.name)}</span>
-        <span class="bar-track"><i style="--bar-width: ${width}%; --bar-color: ${chartColors[index % chartColors.length]}"></i></span>
-        <strong>${formatWan(rank.value)}</strong>
-      </div>
-    `;
-  }).join("");
-}
-
 function renderPerformanceDashboard() {
   const dashboard = document.querySelector("#performanceDashboard");
   const dashboardHeader = document.querySelector("#dashboardHeader");
@@ -382,71 +348,39 @@ function renderPerformanceDashboard() {
   const sales = visibleSalesItems();
   const now = todayDate();
   const today = dateKey(now);
-  const yesterday = dateKey(shiftDate(now, -1));
   const weekStart = startOfWeek(now);
   const monthStart = startOfMonth(now);
   const monthEnd = endOfMonth(now);
-  const todayItems = sales.filter((item) => item.date === today);
-  const yesterdayItems = sales.filter((item) => item.date === yesterday);
   const weekItems = sales.filter((item) => isBetweenDates(item.date, weekStart, now));
   const lastWeekItems = sales.filter((item) => isBetweenDates(item.date, shiftDate(weekStart, -7), shiftDate(weekStart, -1)));
   const monthItems = sales.filter((item) => isBetweenDates(item.date, monthStart, now));
   const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
   const lastMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0);
   const lastMonthItems = sales.filter((item) => isBetweenDates(item.date, lastMonthStart, lastMonthEnd));
-  const todayAmount = sumSales(todayItems);
-  const yesterdayAmount = sumSales(yesterdayItems);
   const weekAmount = sumSales(weekItems);
   const lastWeekAmount = sumSales(lastWeekItems);
   const monthAmount = sumSales(monthItems);
   const lastMonthAmount = sumSales(lastMonthItems);
-  const dayGoalRate = goalRate(todayAmount, salesGoals.day);
-  const yesterdayGoalRate = goalRate(yesterdayAmount, salesGoals.day);
+  const monthProfit = monthItems.reduce((sum, item) => sum + profitOf(item), 0);
   const monthRate = goalRate(monthAmount, salesGoals.month);
   const elapsedDays = now.getDate();
   const monthDays = monthEnd.getDate();
   const timeRate = Math.round((elapsedDays / monthDays) * 100);
 
-  document.querySelector("#todayLabel").textContent = `今日（${today}）`;
-  document.querySelector("#todayAmount").textContent = formatWan(todayAmount);
-  document.querySelector("#todayGoal").textContent = `（目标: ${formatWan(salesGoals.day)}）`;
-  document.querySelector("#todayRate").textContent = `${dayGoalRate}%`;
-  document.querySelector("#todayMeta").textContent = "定金: 0.00万　退款: 0.00万";
-  renderBadges("#todayBadges", [
-    { label: "环比", value: percentValue(todayAmount, yesterdayAmount) },
-    { label: "同比", value: percentValue(todayAmount, yesterdayAmount) }
-  ]);
-
-  document.querySelector("#yesterdayLabel").textContent = `昨日（${yesterday}）`;
-  document.querySelector("#yesterdayAmount").textContent = formatWan(yesterdayAmount);
-  document.querySelector("#yesterdayGoal").textContent = `（目标: ${formatWan(salesGoals.day)}）`;
-  document.querySelector("#yesterdayRate").textContent = `${yesterdayGoalRate}%`;
-  document.querySelector("#yesterdayMeta").textContent = "定金: 0.00万　退款: 0.00万";
-  renderBadges("#yesterdayBadges", [
-    { label: "环比", value: percentValue(yesterdayAmount, sumSales(sales.filter((item) => item.date === dateKey(shiftDate(now, -2))))) },
-    { label: "同比", value: percentValue(yesterdayAmount, todayAmount) }
-  ]);
-
   document.querySelector("#weekRange").textContent = `统计 ${dateKey(weekStart)}~${today}`;
   document.querySelector("#weekAmount").textContent = formatWan(weekAmount);
-  document.querySelector("#weekGoal").textContent = `（目标: ${formatWan(salesGoals.week)}）`;
-  document.querySelector("#weekMeta").textContent = "定金: 0.00万　退款: 0.00万";
+  document.querySelector("#weekGoal").textContent = formatWan(salesGoals.week);
   renderBadges("#weekBadges", [{ label: "环比", value: percentValue(weekAmount, lastWeekAmount) }]);
 
   document.querySelector("#monthRange").textContent = `统计 ${dateKey(monthStart)}~${today}`;
   document.querySelector("#monthAmount").textContent = formatWan(monthAmount);
-  document.querySelector("#monthGoal").textContent = `（目标: ${formatWan(salesGoals.month)}）`;
-  document.querySelector("#monthMeta").textContent = "定金: 0.00万　退款: 0.00万";
+  document.querySelector("#monthProfit").textContent = formatWan(monthProfit);
+  document.querySelector("#monthGoal").textContent = formatWan(salesGoals.month);
   renderBadges("#monthBadges", [{ label: "环比", value: percentValue(monthAmount, lastMonthAmount) }]);
   document.querySelector("#monthProgressText").textContent = `${monthRate}%`;
   document.querySelector("#monthProgressBar").style.setProperty("--progress-width", `${Math.min(monthRate, 100)}%`);
   document.querySelector("#monthTimeText").textContent = `${timeRate}%`;
   document.querySelector("#monthTimeBar").style.setProperty("--progress-width", `${timeRate}%`);
-
-  renderRank("#todayRank", todayItems);
-  renderRank("#yesterdayRank", yesterdayItems);
-  renderRank("#weekRank", weekItems);
-  renderRank("#monthRank", monthItems);
 }
 
 function canUse(feature) {
