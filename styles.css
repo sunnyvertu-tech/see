@@ -1274,6 +1274,12 @@ dialog::backdrop {
   overflow: auto;
 }
 
+#pageUserList {
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  max-height: none;
+  overflow: visible;
+}
+
 .user-row {
   display: flex;
   justify-content: space-between;
@@ -1301,6 +1307,19 @@ dialog::backdrop {
 .user-row span {
   color: var(--muted);
   font-size: 13px;
+}
+
+#pageUserList .user-row {
+  align-items: stretch;
+  min-height: 92px;
+}
+
+#pageUserList .user-row span {
+  display: -webkit-box;
+  overflow: hidden;
+  white-space: normal;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
 .user-row button:disabled {
@@ -1650,6 +1669,10 @@ dialog::backdrop {
   }
 
   .user-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  #pageUserList {
     grid-template-columns: 1fr;
   }
 
