@@ -340,8 +340,10 @@ function renderRank(containerId, list) {
 
 function renderPerformanceDashboard() {
   const dashboard = document.querySelector("#performanceDashboard");
+  const dashboardHeader = document.querySelector("#dashboardHeader");
   const shouldShowDashboard = !currentView && canUse("sales");
   dashboard.classList.toggle("hidden", !shouldShowDashboard);
+  dashboardHeader?.classList.toggle("hidden", !shouldShowDashboard);
   if (!shouldShowDashboard) return;
 
   const sales = visibleSalesItems();
